@@ -412,5 +412,65 @@ def process_command():
     # If no command matches, return a default redirect (could be a local route as well)
     return jsonify({'redirect_url': '/home'})
 
+@app.route('/teacher-signup', methods=['GET', 'POST'])
+def teacher_signup():
+    if request.method == 'POST':
+        # Capture form inputs
+        name = request.form['name']
+        age = request.form['age']
+        usn = request.form['usn']
+        institution = request.form['institution']
+        
+        # Capture face
+        face = capture_face()
+
+        if face is None:
+            print("Face not detected. Please try again.", 'error')
+            # return redirect(url_for('teacher_signup'))
+            return redirect(url_for('t_index'))
+
+        # Define standard face dimensions
+        face_resized = cv2.resize(face, (FACE_WIDTH, FACE_HEIGHT))
+
+        # Save the resized face image
+        filename = secure_filename(usn + '_photo.jpg')
+        filepath = os.path.join(uploads_dir, filename)
+        cv2.imwrite(filepath, face_resized)
+
+        # Optional: Save user details and face in memory or database
+        user_faces[usn] = {
+            'name': name,
+            'age': age,
+            'institution': institution,
+            'face': face_resized,
+        }
+
+        flash("Sign-up successful! You can now sign in.", 'success')
+        return redirect(url_for('t_index'))  # Redirect to signin after signup
+
+    return render_template('teacher_signup.html')
+
+
+@app.route('/teacher-signup2', methods=['POST'])
+def teacher_signup2():
+    # Get form data from the request
+    name = request.form.get('name')
+    age = request.form.get('age')
+    usn = request.form.get('usn')
+    institution = request.form.get('institution')
+    
+    # Example: Save the data to the database (you need to configure your database)
+    # Here, we're just printing the data
+    if name and age and usn and institution:
+        # Replace with actual database logic
+        print(f"Name: {name}, Age: {age}, USN: {usn}, Institution: {institution}")
+        return redirect(url_for('t_index'))
+    else:
+        return redirect(url_for('teacher_signup'))
+    
+@app.route('/t-index',methods=['GET','POST'])
+def t_index():
+    return render_template('t_index.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
