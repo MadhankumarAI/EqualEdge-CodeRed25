@@ -81,19 +81,26 @@
 
     .camera-container {
       background: white;
-      padding: 20px;
+      padding: 40px;
       border-top: 1px solid #ef7096;
+      display: flex; /* Ensures proper alignment for .camera-box */
+      align-items: center;
+      justify-content: center;
+      height: 300px; /* Set desired height for the container */
+      width: 400px; /* Set desired width for the container */
+      box-sizing: border-box; /* Includes padding and border in total size */
     }
-
+    
     .camera-box {
       background: var(--pink-light);
-      height: 200px;
+      height: 100%; /* Matches the height of .camera-container */
+      width: 100%; /* Matches the width of .camera-container */
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
+    
     .form-container {
       background: #e30045;
       padding: 20px;
@@ -206,50 +213,113 @@
       border-bottom: 1px solid white;
     }
     .ai-tools {
-      font-size: 18px;
-      padding: 16px;
+      font-size: 16px; /* Slightly smaller font size */
+      padding: 8px; /* Reduced padding */
       position: absolute;
       top: 50%; /* Center vertically */
-      right: 20px; /* Align to the right */
+      right: 10px; /* Align to the right */
       transform: translateY(-50%); /* Adjust for perfect vertical centering */
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px; /* Space between elements */
+      gap: 15px; /* Reduced space between elements */
   }
   
   .ai-tools h3 {
-      margin-bottom: 20px;
+      margin-bottom: 15px; /* Reduced margin */
       text-align: center;
       color: #500323;
   }
   
   .square {
-      width: 300px;
-      height: 300px;
+      width: 200px; /* Reduced width */
+      height: 200px; /* Reduced height */
       display: flex;
       justify-content: center;
       align-items: center;
       background-color: #500323;
       color: white;
-      font-size: 14px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-size: 12px; /* Reduced font size */
+      border-radius: 6px; /* Slightly smaller border radius */
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
       text-align: center;
-      padding: 8px;
+      padding: 6px; /* Reduced padding */
   }
   
   .square:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05); /* Smaller hover scaling */
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Adjusted hover shadow */
   }
   
   .square i {
-      margin-right: 5px;
-      font-size: 20px;
-  }       
+      margin-right: 4px; /* Adjusted icon spacing */
+      font-size: 16px; /* Reduced icon size */
+  }
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .biometric-section,
+  .regular-section {
+    width: 50%;
+  }
+  
+  .camera-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .camera-box {
+    width: 50%;
+  }
+  
+  .form-container {
+    margin-top: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .sign-in-btn {
+    margin-top: 20px;
+    background-color:rgb(219, 74, 67);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .sign-in-btn:hover {
+    background-color:rgb(158, 45, 0);
+  }
+
+  .camera-box {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #live-feed {
+    max-width: 100%; /* Ensures the image scales down if too wide */
+    max-height: 100%; /* Ensures the image scales down if too tall */
+    object-fit: cover; /* Ensures the image covers the box dimensions */
+  }
+  
+  
   </style>
 </head>
 <body>
@@ -266,76 +336,85 @@
     </div>
   </nav>
 
-
-
   <div class="container">
-    <!-- Biometric Sign-In Section -->
-    <div class="biometric-section" id="biometric-section">
-      <form id="signup-form" method="POST" action="/signup">
-        <div class="biometric-title">Biometric Sign Up</div>
-        <div class="camera-container">
-          <div class="camera-box">
-            <div class="container mt-4">
-              {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                  <div class="alert-container">
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ category }}">
-                        {{ message }}
-                      </div>
-                    {% endfor %}
-                  </div>
-                {% endif %}
-              {% endwith %}
-              <img id="live-feed" src="{{ url_for('video_feed') }}" alt="Live Camera Feed">
+    <div class="row">
+      <!-- Biometric Sign-Up Section (Left) -->
+      <div class="col-md-6 biometric-section" id="biometric-section">
+        <form id="signup-form" method="POST" action="/signup">
+          <div class="biometric-title">Biometric Sign Up</div>
+          <div class="camera-container">
+            <div class="camera-box">
+              <div class="container mt-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div class="alert-container">
+                      {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                          {{ message }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                <img id="live-feed" src="{{ url_for('video_feed') }}" height=290,width=390 alt="Live Camera Feed">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="form-container">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" name="name" id="biometric-name" placeholder="Enter your name" required>
+          
+          <div class="form-container">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" name="name" id="biometric-name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+              <label for="age">Age:</label>
+              <input type="number" name="age" id="biometric-age" placeholder="Enter your age" required>
+            </div>
+            <div class="form-group">
+              <label for="usn">USN:</label>
+              <input type="text" name="usn" id="biometric-usn" placeholder="Enter your USN" required>
+            </div>
+            <div class="form-group">
+              <label for="institution">Name of Institution:</label>
+              <input type="text" name="institution" id="biometric-institution" placeholder="Enter institution name" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="age">Age:</label>
-            <input type="number" name="age" id="biometric-age" placeholder="Enter your age" required>
-          </div>
-          <div class="form-group">
-            <label for="usn">USN:</label>
-            <input type="text" name="usn" id="biometric-usn" placeholder="Enter your USN" required>
-          </div>
-          <div class="form-group">
-            <label for="institution">Name of Institution:</label>
-            <input type="text" name="institution" id="biometric-institution" placeholder="Enter institution name" required>
-          </div>
-        </div>
-        
-        <button type="submit" class="sign-in-btn">Submit</button>
-       
-      </form>
-    </div>
-    
-
-    <!-- Regular Sign-In Section -->
-    <div class="regular-section" id="regular-section">
-      <div class="regular-title">Regular Sign un</div>
-      <div class="form-container">
-        <div class="form-group">
-          <label>Name:</label>
-          <input type="text" name="name" id="regular-name" placeholder="Enter your name">
-        </div>
-        <div class="form-group">
-          <label>Email:</label>
-          <input type="email" name="email" id="regular-email" placeholder="Enter your email">
-        </div>
-        <div class="form-group">
-          <label>Password:</label>
-          <input type="password" name="password" id="regular-password" placeholder="Enter your password">
-        </div>
+  
+          <button type="submit" class="sign-in-btn">Submit</button>
+        </form>
       </div>
-      <button class="sign-in-btn" id="regular-login-btn">Regular Sign un</button>
+  
+      <!-- Regular Sign-Up Section (Right) -->
+      <div class="col-md-6 regular-section">
+        <form id="signup-form" method="POST" action="/signup2">
+          <div class="biometric-title">Regular Sign Up</div>
+          
+          <div class="form-container">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" name="name" id="regular-name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+              <label for="age">Age:</label>
+              <input type="number" name="age" id="regular-age" placeholder="Enter your age" required>
+            </div>
+            <div class="form-group">
+              <label for="usn">USN:</label>
+              <input type="text" name="usn" id="regular-usn" placeholder="Enter your USN" required>
+            </div>
+            <div class="form-group">
+              <label for="institution">Name of Institution:</label>
+              <input type="text" name="institution" id="regular-institution" placeholder="Enter institution name" required>
+            </div>
+          </div>
+          
+          <button type="submit" class="sign-in-btn">Submit</button>
+        </form>
+      </div>
     </div>
   </div>
+  
+
   <div class="settings-container">
     <div class="settings-btn" onclick="toggleDropdown('fontDropdown')">Font</div>
     <div class="dropdown" id="fontDropdown">
