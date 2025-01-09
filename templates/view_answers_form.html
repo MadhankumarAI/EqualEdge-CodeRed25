@@ -4,21 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Student Answers</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #e60050;
+        }
+
+        form {
+            width: 80%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        input[type="number"], input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .mic-button {
+            background-color: #e60050;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+
+        .mic-button:active {
+            background-color: #cc0048;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e60050;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #cc0048;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: white;
+            background-color: #e60050;
+            padding: 10px 20px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #cc0048;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            form {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>Enter Student Details to View Answers</h1>
     
     <form method="POST">
         <label for="test_id">Test ID:</label>
-        <input type="number" name="test_id" required>
-        <br>
+        <div class="input-wrapper">
+            <input type="number" name="test_id" id="test_id" placeholder="Enter Test ID" required>
+            <button type="button" class="mic-button" id="mic-test-id" title="Voice Input for Test ID">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
         <label for="student_id">Student ID:</label>
-        <input type="text" name="student_id" required>
-        <br>
+        <div class="input-wrapper">
+            <input type="text" name="student_id" id="student_id" placeholder="Enter Student ID" required>
+            <button type="button" class="mic-button" id="mic-student-id" title="Voice Input for Student ID">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
         <button type="submit">View Answers</button>
     </form>
     
-    <br>
     <a href="/">Go Back to Home</a>
+
+    <script>
+        // Debugging and setup for microphone input
+        function setupMicInput(buttonId, inputId) {
+            const micButton = document.getElementById(buttonId);
+            const inputField = document.getElementById(inputId);
+            let recognition;
+
+            console.log('Setting up Speech Recognition...');
+            // Check if SpeechRecognition API is supported
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                console.log('Speech Recognition supported');
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+
+                recognition.continuous = false; // Don't keep recording after the user stops speaking
+                recognition.lang = 'en-US'; // Default language
+                recognition.interimResults = false; // Only get final results
+
+                // When the mic button is clicked, start speech recognition
+                micButton.addEventListener('click', () => {
+                    console.log('Starting speech recognition...');
+                    recognition.start();
+                    micButton.classList.add('active');
+                });
+
+                // Process the speech input result
+                recognition.onresult = (event) => {
+                    const speechToText = event.results[0][0].transcript;
+                    console.log('Speech recognized:', speechToText); // Log the recognized text
+                    inputField.value += speechToText; // Append the recognized text to the input
+                };
+
+                // Stop recognition when speech ends
+                recognition.onspeechend = () => {
+                    console.log('Speech ended');
+                    recognition.stop();
+                    micButton.classList.remove('active');
+                };
+
+                // Handle errors
+                recognition.onerror = (event) => {
+                    console.log('Error occurred:', event.error);
+                    alert(`Error occurred: ${event.error}`);
+                    micButton.classList.remove('active');
+                };
+            } else {
+                console.log('Speech Recognition not supported in this browser.');
+                // Fallback for browsers that don't support Speech Recognition
+                micButton.addEventListener('click', () => {
+                    alert('Voice input is not supported in your browser.');
+                });
+            }
+        }
+
+        // Set up voice input for Test ID and Student ID
+        setupMicInput('mic-test-id', 'test_id');
+        setupMicInput('mic-student-id', 'student_id');
+    </script>
+    <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
 </body>
 </html>
