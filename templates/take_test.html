@@ -1,14 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <title>Take Test</title>
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #e60050;
+        }
+
+        form {
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 50px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            display: inline-block;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e60050;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #cc0048;
+        }
+
+        /* Voice Input Button */
+        .mic-button {
+            background-color: #e60050;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+
+        .mic-button:active {
+            background-color: #cc0048;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            form {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Page Heading -->
     <h1>Enter Test ID</h1>
+
+    <!-- Test ID Form -->
     <form method="POST">
         <label for="test_id">Test ID:</label>
-        <input type="text" name="test_id" id="test_id" required><br>
+        <div>
+            <input type="text" name="test_id" id="test_id" placeholder="Enter Test ID" required>
+            <button type="button" class="mic-button" id="mic-button" title="Voice Input">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
         <button type="submit">Start Test</button>
     </form>
+
+    <script>
+        // Voice Input Logic
+        const micButton = document.getElementById('mic-button');
+        const testIdInput = document.getElementById('test_id');
+        let recognition;
+
+        // Check if Speech Recognition API is supported
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+
+            recognition.continuous = false; // Stop automatically after speech ends
+            recognition.lang = 'en-US'; // Default language
+            recognition.interimResults = false;
+
+            // Start recognition when the mic button is clicked
+            micButton.addEventListener('click', () => {
+                recognition.start();
+                micButton.classList.add('active');
+            });
+
+            // Handle recognition result
+            recognition.onresult = (event) => {
+                let speechToText = event.results[0][0].transcript;
+
+                // Remove trailing punctuation like full stop
+                speechToText = speechToText.replace(/[.,!?]+$/, '');
+
+                testIdInput.value += speechToText; // Append the cleaned text
+            };
+
+            // Handle recognition end
+            recognition.onspeechend = () => {
+                recognition.stop();
+                micButton.classList.remove('active');
+            };
+
+            // Handle errors
+            recognition.onerror = (event) => {
+                if (event.error === 'no-speech') {
+                    alert('No speech detected. Microphone stopped.');
+                } else {
+                    alert(`Error occurred: ${event.error}`);
+                }
+                micButton.classList.remove('active');
+            };
+        } else {
+            // Fallback for unsupported browsers
+            micButton.addEventListener('click', () => {
+                alert('Voice input is not supported in your browser.');
+            });
+        }
+    </script>
+    <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
 </body>
 </html>
