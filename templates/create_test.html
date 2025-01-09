@@ -37,6 +37,8 @@
             background-color: #f9f9f9;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            text-align: center; /* Centers content inside the form */
         }
 
         label {
@@ -76,15 +78,17 @@
             background-color: #e60050;
             border: none;
             color: white;
-            border-radius: 50%;
-            width: 40px;
+            border-radius: 30%; /* Decreased radius */
+            width: 40px; /* Reduced size */
             height: 40px;
             display: inline-flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            margin-left: 10px;
+            margin: 10px auto 0; /* Center horizontally and add spacing */
             font-size: 1rem;
+            position: relative;
+            top: 8px;
         }
 
         .mic-button:active {
@@ -112,6 +116,10 @@
                 <i class="fas fa-microphone"></i>
             </button>
         </div>
+        
+        <label for="created_by">Created By :</label>
+        <input type="text" name="created_by" id="created_by" placeholder="Enter creator's id" required>
+
         <button type="submit">Create Test</button>
     </form>
 
@@ -165,8 +173,5 @@
             });
         }
     </script>
-    <script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
 </body>
 </html>
