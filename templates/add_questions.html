@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Questions</title>
+</head>
+<body>
+    <h1>Add Questions to Test ID: {{ test_id }}</h1>
+    <form method="POST">
+        <label for="question_text">Question:</label>
+        <textarea name="question_text" id="question_text" required></textarea><br>
+        <button type="submit">Add Question</button>
+    </form>
+</body>
+</html>

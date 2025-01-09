@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Test Questions</title>
+</head>
+<body>
+    <h1>Test ID: {{ test_id }}</h1>
+    <form method="POST">
+        {% for question in questions %}
+        <div>
+            <p>{{ question.question_text }}</p>
+            <textarea name="answer_{{ question.question_id }}" required></textarea>
+        </div>
+        {% endfor %}
+        <button type="submit">Submit Answers</button>
+    </form>
+</body>
+</html>
