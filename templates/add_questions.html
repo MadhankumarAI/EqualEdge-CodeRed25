@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-    <title>Add Questions</title>
+    <title>Test Questions</title>
     <style>
         /* Base Styles */
         * {
@@ -31,7 +31,7 @@
 
         form {
             width: 80%;
-            max-width: 500px;
+            max-width: 700px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f9f9f9;
@@ -39,20 +39,21 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
+        div {
+            margin-bottom: 20px;
+        }
+
+        p {
             font-weight: bold;
+            margin-bottom: 8px;
             color: #333;
         }
 
         textarea {
             width: calc(100% - 50px);
             padding: 10px;
-            margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            display: inline-block;
             resize: none;
             height: 100px;
         }
@@ -102,67 +103,78 @@
     </style>
 </head>
 <body>
-    <h1>Add Questions to Test ID: {{ test_id }}</h1>
+    <!-- Page Heading -->
+    <h1>Test ID: {{ test_id }}</h1>
+
+    <!-- Questions Form -->
     <form method="POST">
-        <label for="question_text">Question:</label>
+        {% for question in questions %}
         <div>
-            <textarea name="question_text" id="question_text" placeholder="Enter your question here" required></textarea>
-            <button type="button" class="mic-button" id="mic-button" title="Voice Input">
-                <i class="fas fa-microphone"></i>
-            </button>
+            <p>{{ question.question_text }}</p>
+            <div>
+                <textarea name="answer_{{ question.question_id }}" id="answer_{{ question.question_id }}" placeholder="Enter your answer here" required></textarea>
+                <button type="button" class="mic-button" data-target="answer_{{ question.question_id }}" title="Voice Input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
         </div>
-        <button type="submit">Add Question</button>
+        {% endfor %}
+        <button type="submit">Submit Answers</button>
     </form>
 
     <script>
         // Voice Input Logic
-        const micButton = document.getElementById('mic-button');
-        const questionTextArea = document.getElementById('question_text');
-        let recognition;
+        const micButtons = document.querySelectorAll('.mic-button');
 
-        // Check if Speech Recognition API is supported
-        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
+        micButtons.forEach((button) => {
+            const targetId = button.getAttribute('data-target');
+            const targetTextarea = document.getElementById(targetId);
+            let recognition;
 
-            recognition.continuous = false; // Stop automatically after speech ends
-            recognition.lang = 'en-US'; // Default language
-            recognition.interimResults = false;
+            // Check if Speech Recognition API is supported
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
 
-            // Start recognition when the mic button is clicked
-            micButton.addEventListener('click', () => {
-                recognition.start();
-                micButton.classList.add('active');
-            });
+                recognition.continuous = false; // Stop automatically after speech ends
+                recognition.lang = 'en-US'; // Default language
+                recognition.interimResults = false;
 
-            // Handle recognition result
-            recognition.onresult = (event) => {
-                const speechToText = event.results[0][0].transcript;
-                questionTextArea.value += speechToText; // Append the text to the textarea
-            };
+                // Start recognition when the mic button is clicked
+                button.addEventListener('click', () => {
+                    recognition.start();
+                    button.classList.add('active');
+                });
 
-            // Handle recognition end
-            recognition.onspeechend = () => {
-                recognition.stop();
-                micButton.classList.remove('active');
-            };
+                // Handle recognition result
+                recognition.onresult = (event) => {
+                    const speechToText = event.results[0][0].transcript;
+                    targetTextarea.value += speechToText; // Append the text to the textarea
+                };
 
-            // Handle errors, including timeout
-            recognition.onerror = (event) => {
-                if (event.error === 'no-speech') {
-                    alert('No speech detected. Microphone stopped.');
-                } else {
-                    alert(`Error occurred: ${event.error}`);
-                }
-                micButton.classList.remove('active');
-                recognition.stop();
-            };
-        } else {
-            // Fallback for unsupported browsers
-            micButton.addEventListener('click', () => {
-                alert('Voice input is not supported in your browser.');
-            });
-        }
+                // Handle recognition end
+                recognition.onspeechend = () => {
+                    recognition.stop();
+                    button.classList.remove('active');
+                };
+
+                // Handle errors
+                recognition.onerror = (event) => {
+                    if (event.error === 'no-speech') {
+                        alert('No speech detected. Microphone stopped.');
+                    } else {
+                        alert(`Error occurred: ${event.error}`);
+                    }
+                    button.classList.remove('active');
+                    recognition.stop();
+                };
+            } else {
+                // Fallback for unsupported browsers
+                button.addEventListener('click', () => {
+                    alert('Voice input is not supported in your browser.');
+                });
+            }
+        });
     </script>
     <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
