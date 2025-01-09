@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image to Text Description</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            position: relative;
+        }
+
+        h1 {
+            color: #e60050;
+            text-align: center;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #e60050;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #990033;
+        }
+
+        .upload-container {
+            border: 2px dashed #e60050;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #ffe6f0;
+            transition: border-color 0.3s;
+        }
+
+        .upload-container:hover {
+            border-color: #990033;
+            background-color: #ffb3cc;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 20px 0;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #description {
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 50px;
+            display: none;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #555;
+            border: 1px solid #e60050;
+        }
+
+        .loading {
+            display: none;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .error {
+            color: #e60050;
+            margin-top: 10px;
+            display: none;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .upload-container {
+                padding: 15px;
+            }
+
+            #description {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.history.back();">Back</button>
+    
+    <h1>Image to Text Description</h1>
+    
+    <div class="upload-container" onclick="document.getElementById('fileInput').click()">
+        <p>Click or drag an image here</p>
+        <input type="file" id="fileInput" accept="image/*" style="display: none">
+    </div>
+
+    <img id="imagePreview">
+    <div class="loading" id="loading">Processing image...</div>
+    <div id="description"></div>
+    <div id="errorDetails" class="error"></div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const description = document.getElementById('description');
+        const loading = document.getElementById('loading');
+        const errorDetails = document.getElementById('errorDetails');
+
+        // Replace with your actual token
+        const API_TOKEN = "your_key";
+        const API_URL = "https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large";
+
+        fileInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Check file size
+            if (file.size > 20 * 1024 * 1024) { // 20MB limit
+                errorDetails.style.display = 'block';
+                errorDetails.textContent = 'File too large. Please choose an image under 20MB.';
+                return;
+            }
+
+            // Reset states
+            errorDetails.style.display = 'none';
+            imagePreview.style.display = 'block';
+            imagePreview.src = URL.createObjectURL(file);
+            loading.style.display = 'block';
+            description.style.display = 'none';
+
+            try {
+                // Convert image to base64
+                const base64Image = await convertToBase64(file);
+                
+                console.log('Making API request...');
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ inputs: base64Image })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API Error (${response.status}): ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('API Response:', result);
+
+                if (!result || !result[0] || !result[0].generated_text) {
+                    throw new Error('Invalid response format from API');
+                }
+
+                loading.style.display = 'none';
+                description.style.display = 'block';
+                description.textContent = result[0].generated_text;
+
+            } catch (error) {
+                console.error('Detailed error:', error);
+                loading.style.display = 'none';
+                errorDetails.style.display = 'block';
+                errorDetails.textContent = `Error: ${error.message}. Please check your API token and try again.`;
+            }
+        });
+
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>
