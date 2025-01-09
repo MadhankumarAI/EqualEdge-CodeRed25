@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session,flash,Response
 # import requests
 import pyttsx3
 import threading
@@ -90,43 +90,133 @@ def ask_disability():
     threading.Thread(target=speak_text, args=(text,)).start()
     return jsonify({"text": text})
 
+import cv2
+
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+webcam = None
+uploads_dir = 'uploads'
+os.makedirs(uploads_dir, exist_ok=True)
+user_faces = {}  # Dictionary to hold registered faces
+
+# Constants for face dimensions
+FACE_WIDTH, FACE_HEIGHT = 80, 80
+
+# Define upload folder path
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
 
 
+# Load registered faces into memory
+def load_registered_faces():
+    for filename in os.listdir(uploads_dir):
+        if filename.endswith('.jpg'):
+            username = filename.rsplit('.', 1)[0]
+            filepath = os.path.join(uploads_dir, filename)
+            face = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+            user_faces[username] = face
 
+# Call to load faces at app startup
+load_registered_faces()
+
+# Function to capture a face from the webcam
+def capture_face():
+    global webcam
+    webcam = cv2.VideoCapture(0, cv2.CAP_ANY)  # Use any backend for webcam
+
+    if not webcam.isOpened():
+        print("Error: Could not access the webcam.")
+        return None
+
+    ret, frame = webcam.read()
+    webcam.release()  # Release the webcam
+
+    if not ret:
+        print("Failed to grab frame")
+        return None
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    if len(faces) == 0:
+        print("No face detected")
+        return None
+
+    x, y, w, h = faces[0]
+    face = gray[y:y + h, x:x + w]  # Extract grayscale face region
+    return face
+
+# Function to generate video frames for live feed
+def gen_frames():
+    global webcam
+    webcam = cv2.VideoCapture(0, cv2.CAP_ANY)  # Use any backend for webcam
+
+    if not webcam.isOpened():
+        print("Error: Could not access the webcam.")
+        return
+
+    webcam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+    try:
+        while True:
+            ret, frame = webcam.read()
+            if not ret:
+                print("Failed to grab frame")
+                break
+
+            ret, buffer = cv2.imencode('.jpg', frame)
+            if not ret:
+                print("Failed to encode frame")
+                continue
+
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    finally:
+        webcam.release()  # Ensure the webcam is released
+
+
+# Route for signing up a user
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    """Handle user sign-up."""
     if request.method == 'POST':
+        # Capture form inputs
         name = request.form['name']
         age = request.form['age']
         usn = request.form['usn']
         institution = request.form['institution']
         
-        # Handle photo capture (biometric face)
-        photo_data = request.form.get('photo')  # Base64 image string
-        if photo_data:
-            photo_filename = f"{usn}_photo.jpg"
-            photo_path = os.path.join('static/user_photos', photo_filename)
-            
-            # Convert base64 string to an image and save
-            image_data = base64.b64decode(photo_data.split(',')[1])
-            os.makedirs(os.path.dirname(photo_path), exist_ok=True)
-            with open(photo_path, 'wb') as f:
-                f.write(image_data)
-        else:
-            return "Photo is required for sign-up.", 400
+        # Capture face
+        face = capture_face()
 
-        # Store user data
-        users_db[usn] = {
+        if face is None:
+            flash("Face not detected. Please try again.", 'error')
+            return redirect(url_for('signup'))
+
+        # Define standard face dimensions
+        face_resized = cv2.resize(face, (FACE_WIDTH, FACE_HEIGHT))
+
+        # Save the resized face image
+        filename = secure_filename(usn + '_photo.jpg')
+        filepath = os.path.join(uploads_dir, filename)
+        cv2.imwrite(filepath, face_resized)
+
+        # Optional: Save user details and face in memory or database
+        user_faces[usn] = {
             'name': name,
             'age': age,
             'institution': institution,
-            'photo': photo_path
+            'face': face_resized,
         }
-        
-        return redirect(url_for('signin'))
-    
+
+        flash("Sign-up successful! You can now sign in.", 'success')
+        return redirect(url_for('signin'))  # Redirect to signin after signup
+
     return render_template('signup.html')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 from werkzeug.utils import secure_filename
 from google.cloud import documentai_v1beta3 as documentai
@@ -257,17 +347,55 @@ def is_partial_match(str1, str2):
 
 print(tasks)
 
-import re
 
+
+@app.route('/cr-teacher')
+def cr_teacher():
+    """Render the cr-teacher page."""
+    return render_template('cr-teacher.html')
+
+@app.route('/profiles')
+def profiles():
+    """Render the profiles page."""
+    return render_template('profiles.html')
+
+@app.route('/report')
+def report():
+    """Render the report page."""
+    return render_template('report.html')
+
+import re
 commands = {
-    'go to home': '/home', 'show home': '/home', 
-    'open profile': '/profile', 'view profile': '/profile', 
-    'view tasks': '/todo', 'show tasks': '/todo', 
-    'open assignments': '/assignments', 'view assignments': '/assignments', 
-    'go to intro': '/intro', 'show intro': '/intro', 
-    'open upload': '/upload', 'go to upload': '/upload', 
-    'sign up': '/signup', 'open signup': '/signup'
+    'go to home': '/home', 'show home': '/home',
+    'open profile': '/profile', 'view profile': '/profile',
+    'view task': '/todo', 'show task': '/todo',
+    'open assignments': '/assignments', 'view assignments': '/assignments',
+    'go to intro': '/intro', 'show intro': '/intro',
+    'open upload': '/upload', 'go to upload': '/upload',
+    'sign up': '/signup', 'open signup': '/signup',
+    'go to first': '/', 'show first': '/',
+    'go to cr-teacher': '/cr-teacher', 'show cr-teacher': '/cr-teacher',
+    'go to home page': '/home', 'show home page': '/home',
+    'go to profiles': '/profiles', 'show profiles': '/profiles',
+    'go to report': '/report', 'show report': '/report'
 }
+
+@app.route('/signup2', methods=['POST'])
+def signup2():
+    # Get form data from the request
+    name = request.form.get('name')
+    age = request.form.get('age')
+    usn = request.form.get('usn')
+    institution = request.form.get('institution')
+    
+    # Example: Save the data to the database (you need to configure your database)
+    # Here, we're just printing the data
+    if name and age and usn and institution:
+        # Replace with actual database logic
+        print(f"Name: {name}, Age: {age}, USN: {usn}, Institution: {institution}")
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('signup'))
 
 
 @app.route('/process_command', methods=['POST'])
