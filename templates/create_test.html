@@ -148,10 +148,15 @@
                 micButton.classList.remove('active');
             };
 
-            // Handle errors
+            // Handle errors, including timeout
             recognition.onerror = (event) => {
-                alert(`Error occurred: ${event.error}`);
+                if (event.error === 'no-speech') {
+                    alert('No speech detected. Microphone stopped.');
+                } else {
+                    alert(`Error occurred: ${event.error}`);
+                }
                 micButton.classList.remove('active');
+                recognition.stop();
             };
         } else {
             // Fallback for unsupported browsers
