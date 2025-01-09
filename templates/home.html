@@ -6,6 +6,7 @@
     <title>Classroom</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='custom.js') }}"></script>
+    <script src="{{ url_for('static', filename='hover.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
     <style>
         * {
@@ -14,30 +15,6 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
             font-weight: bold;
-        }
-        *:focus {
-            outline: 3px solid #81002b;
-            outline-offset: 2px;
-        }
-        .nav-item:focus,
-        .tool-button:focus,
-        .join-button:focus,
-        .class-card:focus-within {
-            box-shadow: 0 0 0 3px #81002b;
-        }
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 0;
-            background: #81002b;
-            color: white;
-            padding: 8px;
-            z-index: 100;
-            transition: top 0.3s;
-        }
-
-        .skip-link:focus {
-            top: 0;
         }
 
         .sidebar {
@@ -85,7 +62,7 @@
         }
 
         .nav-item.active {
-            background: #740328;
+            background: #f5f5f5;
         }
 
         .nav-item i {
@@ -99,18 +76,11 @@
             padding: 16px;
             margin-top: 40px;
         }
+
         .ai-tools .nav-item {
             font-size: 18px;
-            color: white; /* Changed from #500323 to white */
+            color: #500323;
         }
-
-        /* ... rest of the existing styles ... */
-
-        /* Make sure the Mitra icon is also white */
-        .ai-tools .nav-item i {
-            color: white;
-        }
-        
 
         .class-card {
             background: white;
@@ -150,14 +120,7 @@
             flex-wrap: wrap;
             gap: 30px;
         }
-        .font-tool{
-            background: #81002b;
-            color: white;
-            border: none;
-            padding:8px 16px;
-            border-radius: 20px;
-            cursor:pointer;
-        }
+
         .join-button {
             background: #81002b;
             color: white;
@@ -207,7 +170,6 @@
             align-items: center;
             gap: 8px;
         }
-        
         .nav-item {
             display: flex;
             align-items: center;
@@ -221,62 +183,6 @@
         
         .nav-item:hover {
             background-color: #a60039;
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: #360010;
-            color: #ffffff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-            font-weight: normal;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Arrow for tooltip */
-        .tooltip .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-        }
-
-        /* Show tooltip on hover and focus */
-        .tooltip:hover .tooltip-text,
-        .tooltip:focus .tooltip-text,
-        .tooltip:focus-within .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Adjust tooltip position for different elements */
-        .header .tooltip .tooltip-text {
-            bottom: auto;
-            top: 125%;
-        }
-
-        .header .tooltip .tooltip-text::after {
-            top: auto;
-            bottom: 100%;
-            border-color: transparent transparent #333 transparent;
         }
         @keyframes flicker {
           0% { background-color: #FF0000; }
@@ -305,136 +211,161 @@
       .flicker-button:hover {
           background-color: #a60039;
       }
+      .ai-tools {
+        font-size: 18px;
+        padding: 16px;
+        position: absolute;
+        top: 50%; /* Center vertically */
+        right: 20px; /* Align to the right */
+        transform: translateY(-50%); /* Adjust for perfect vertical centering */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px; /* Space between elements */
+    }
+    
+    .ai-tools h3 {
+        margin-bottom: 20px;
+        text-align: center;
+        color: #500323;
+    }
+    
+    .square {
+        width: 300px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #500323;
+        color: white;
+        font-size: 14px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+        padding: 8px;
+    }
+    
+    .square:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .square i {
+        margin-right: 5px;
+        font-size: 20px;
+    }       
       
         
     </style>
 </head>
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    <div class="sidebar" role="navigation" aria-label="Main navigation">
-        <h2 id="site-title" style="margin-bottom: 20px; font-size: 24px;">Classroom</h2>
+    <div class="sidebar">
+        <h2 style="margin-bottom: 20px; font-size: 24px;">Classroom</h2>
         <nav>
-            <div class="nav-item active" role="button" tabindex="0" aria-current="page" 
-                 onkeypress="if(event.key==='Enter') this.click()">
-                <i class="fas fa-home" aria-hidden="true"></i>
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
                 <span>Home</span>
             </div>
 
-            <div class="nav-item" role="button" tabindex="0" 
-                 onkeypress="if(event.key==='Enter') window.location.href='/todo'"
-                 onclick="window.location.href='/todo'">
-                <i class="fas fa-tasks" aria-hidden="true"></i>
+            <div class="nav-item" onclick="window.location.href='/todo'" style="cursor: pointer;">
+                <i class="fas fa-tasks"></i>
                 <span>To-do</span>
             </div>
             
-            <div class="nav-item" role="button" tabindex="0"
-            onkeypress="if(event.key==='Enter') window.location.href='/todo'"
-            onclick="window.location.href='/todo'">
+            <div class="nav-item">
                 <i class="fas fa-user-graduate"></i>
                 <span>Enrolled</span>
             </div>
-
-            <div class="nav-item" role="button" tabindex="0"
-            onkeypress="if(event.key==='Enter') window.location.href='/todoo'"
-            onclick="window.location.href='/todo'">
+            <div class="nav-item">
                 <i class="fas fa-flask"></i>
                 <span>Science</span>
                 <div class="circle-badge"></div>
             </div>
-            <div class="nav-item" role="button" tabindex="0"
-            onkeypress="if(event.key==='Enter')window.location.href='/todo'"
-            onclick="window.location.href='/todo'">
+            <div class="nav-item">
                 <i class="fas fa-calculator"></i>
                 <span>Mathematics</span>
                 <div class="circle-badge"></div>
             </div>
         </nav>
         
-        <div class="ai-tools" role="region" aria-labelledby="ai-tools-heading">
-            <h3 id="ai-tools-heading" style="margin-bottom: 20px;">AI Tools</h3>
-            <div class="nav-item tooltip" role="button" tabindex="0"
-                 onkeypress="if(event.key==='Enter') this.click()">
-                <i class="fas fa-robot" aria-hidden="true"></i>
+        <div class="ai-tools">
+            <h3 style="margin-bottom: 20px;">AI Tools</h3>
+            <div class="nav-item">
+                <i class="fas fa-robot"></i>
                 <span>Mitra</span>
-                <span class="tooltip-text" role="tooltip">Need help? Click here to chat with Mitra, your friendly assistant!</span>
             </div>
-            <div class="nav-item tooltip">
-                <button id="anvaya-item" class="flicker-button" aria-label="Activate Anvaya AI">
-                    <i class="fas fa-mouse-pointer" aria-hidden="true"></i>
-                    <span>Anvaya</span>
-                    <span class="tooltip-text" role="tooltip">Need guidance for navigation? Click here to let Anvaya assist you!</span>
-                </button>
-            </div>
+            <div class="nav-item">
+              <button id="anvaya-item" class="flicker-button">
+                  <i class="fas fa-mouse-pointer"></i>
+                  <span>Anvaya</span>
+              </button>
+          </div>
+          
         </div>
     </div>
 
-    <header class="header" role="banner">
+    <header class="header">
         <div style="display: flex; align-items: center;">
-            <button style="background: none; border: none; margin-right: 20px;" aria-label="Toggle menu">
-                <i class="fas fa-bars" aria-hidden="true"></i>
+            <button style="background: none; border: none; margin-right: 20px;">
+                <i class="fas fa-bars"></i>
             </button>
             <h2>Classroom</h2>
         </div>
         <div style="display: flex; align-items: center; gap: 20px;">
-            <button class="font-tool tooltip" aria-haspopup="true" aria-expanded="false"
-                    onclick="toggleDropdown('fontDropdown')">
-                <i class="fas fa-t" aria-hidden="true"></i>
+            <div class="font-tool">
+                <i class="fas fa-t"></i>
                 <span>Text Font</span>
-                <span class="tooltip-text" role="tooltip">Click to change Text font</span>
-            </button>
-            <button class="join-button" aria-label="Join new class">
+            </div>
+            <button class="join-button">
                 + Join Class
             </button>
-            <button class="user-profile tooltip" aria-label="User profile">
-                <i class="fas fa-user" aria-hidden="true"></i>
-                <span class="tooltip-text" role="tooltip">View Profile</span>
-            </button>
+            <div class="user-profile">
+                <i class="fas fa-user"></i>
+            </div>
         </div>
     </header>
 
-
-    <main id="main-content" class="main-content" role="main">
-        <div class="class-grid" role="list">
-            <div class="class-card" role="listitem" tabindex="0">
+    <main class="main-content">
+        <div class="class-grid">
+            <div class="class-card">
                 <div class="class-header math">
                     <h3>Mathematics</h3>
                     <div style="font-size: 14px;">Ms Anita</div>
                 </div>
                 <div class="class-content">
-                    <button style="background: none; border: none;" aria-label="Open folder">
-                        <i class="fas fa-folder" aria-hidden="true"></i>
+                    <button style="background: none; border: none;">
+                        <i class="fas fa-folder"></i>
                     </button>
-                    <button style="background: none; border: none;" aria-label="Toggle selection">
-                        <i class="far fa-square" aria-hidden="true"></i>
+                    <button style="background: none; border: none;">
+                        <i class="far fa-square"></i>
                     </button>
                 </div>
             </div>
             
-            <div class="class-card" role="listitem" tabindex="0">
+            <div class="class-card">
                 <div class="class-header science">
                     <h3>Science</h3>
                     <div style="font-size: 14px;">Mr Amit</div>
                 </div>
                 <div class="class-content">
-                    <button style="background: none; border: none;" aria-label="Open folder">
-                        <i class="fas fa-folder" aria-hidden="'true"></i>
+                    <button style="background: none; border: none;">
+                        <i class="fas fa-folder"></i>
                     </button>
-                    <button style="background: none; border: none;" aria-label="Toggle selection">
-                        <i class="far fa-square" aria-hidden="true"></i>
+                    <button style="background: none; border: none;">
+                        <i class="far fa-square"></i>
                     </button>
                 </div>
             </div>
         </div>
     </main>
-    <div class="settings-container" role="complementary" aria-label="Display settings">
-        <div class="settings-btn" role="button" tabindex="0" 
-             onclick="toggleDropdown('fontDropdown')"
-             onkeypress="if(event.key==='Enter') toggleDropdown('fontDropdown')"
-             aria-expanded="false" aria-controls="fontDropdown">Font</div>
-        <div class="dropdown" id="fontDropdown" role="menu">
-            <button role="menuitem" onclick="setFont('Arial')">Arial</button>
-            <button role="menuitem" onclick="setFont('Courier New')">Courier New</button>
-            <button role="menuitem" onclick="setFont('Georgia')">Georgia</button>
+    <div class="settings-container">
+        <div class="settings-btn" onclick="toggleDropdown('fontDropdown')">Font</div>
+        <div class="dropdown" id="fontDropdown">
+            <button onclick="setFont('Arial')">Arial</button>
+            <button onclick="setFont('Courier New')">Courier New</button>
+            <button onclick="setFont('Georgia')">Georgia</button>
         </div>
     
         <div class="settings-btn" onclick="toggleSlider('fontSizeSlider')">Font Size</div>
@@ -448,6 +379,21 @@
             <input type="range" min="0.5" max="2" value="1" step="0.1" onchange="setContrast(this.value)">
             <p>Contrast: <span id="contrastValue">1</span></p>
         </div>
+    </div>
+    <div class="ai-tools">
+        <h3>AI Tools</h3>
+        <div class="square">
+            <i class="fas fa-robot"></i>
+            <span>Mitra</span>
+        </div>
+        <div class="square">
+            <input type="text" id="voiceInput" placeholder="Enter your command" />
+            <button onclick="sendVoiceCommand(event)">Submit</button>
+            <span id="micIcon" style="cursor: pointer;" onclick="startVoiceRecognition()">🎤</span> <!-- Microphone icon -->
+            <button id="stopButton" style="display: none;" onclick="stopVoiceRecognition(event)">Stop</button> <!-- Stop button -->
+        </div>
+        
+        <div id="result"></div>
     </div>
     <div class="bottom-tools">
         <button class="tool-button">
@@ -463,130 +409,110 @@
             Video Summary
         </button>
     </div>
+    <audio id="popup-sound" src="static/sounds/popup.mp3" preload="auto"></audio>
 
     <script>
-      let recognition;
-      let pauseTimer;
-      
-      function initializeSpeechRecognition() {
-          recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-          recognition.lang = 'en-US';
-          recognition.interimResults = false; // Don't show partial results
-          recognition.maxAlternatives = 1; // Only accept the best alternative
-          recognition.continuous = false;
-      
-          // When speech recognition result is available
-          recognition.onresult = function(event) {
-              const transcript = event.results[0][0].transcript;
-              console.log('Recognized command:', transcript);
-              console.log(transcript)
-      
-              // Send the recognized command to the backend for processing
-              fetch('/process_command', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ command: transcript })
-              })
-              .then(response => response.json())
-              .then(data => {
-                  window.location.href = data.redirect_url;  // Redirect to the URL received from the backend
-              })
-              .catch(err => console.error('Error:', err));
-          };
-      
-          // Handle errors
-          recognition.onerror = function(event) {
-              console.error('Error occurred in recognition:', event.error);
-          };
-      
-          // Restart recognition on end to handle longer speech
-          recognition.onend = function() {
-              if (!pauseTimer) recognition.start();
-          };
-      }
-      function handleDropdownKeyPress(event, dropdownId) {
-            if (event.key === 'Enter' || event.key === ' ') {
+        // Play the sound when the page is fully loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const sound = document.getElementById('popup-sound');
+            sound.play().catch(error => {
+                console.error("Error playing the sound:", error);
+            });
+        });
+    </script>
+   
+
+    <script>
+        (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+        </script>
+  
+<script>
+    //anvaya--------------------------------------------------------
+    (() => {
+        let recognition;
+        let timeoutId;
+        let pauseTimer;
+    
+        function initializeSpeechRecognition() {
+            if (!recognition) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                recognition.continuous = false;
+    
+                recognition.onresult = function (event) {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    console.log("Recognized command:", transcript);
+                    document.getElementById("voiceInput").value = transcript;
+    
+                    fetch('/process_command', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ command: transcript }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            }
+                        })
+                        .catch((err) => console.error("Error:", err));
+                };
+    
+                recognition.onerror = function (event) {
+                    console.error("Error occurred in recognition:", event.error);
+                };
+    
+                recognition.onend = function () {
+                    console.log("Speech recognition ended.");
+                    if (!pauseTimer) recognition.start();
+                };
+            }
+        }
+    
+        window.startVoiceRecognition = function () {
+            initializeSpeechRecognition();
+            try {
+                recognition.start();
+                console.log("Speech recognition started.");
+                document.getElementById("anvaya-item").classList.add("flickering");
+    
+                timeoutId = setTimeout(() => {
+                    stopVoiceRecognition();
+                }, 5000);
+            } catch (error) {
+                console.error("Error starting SpeechRecognition:", error);
+            }
+        };
+    
+        function stopVoiceRecognition() {
+            if (recognition) {
+                recognition.stop();
+                console.log("Speech recognition stopped.");
+            }
+            resetUI();
+        }
+    
+        function resetUI() {
+            document.getElementById("anvaya-item").classList.remove("flickering");
+        }
+    
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
                 event.preventDefault();
-                toggleDropdown(dropdownId);
-            }
-        }
-        function toggleDropdown(id) {
-            const dropdown = document.getElementById(id);
-            const isExpanded = dropdown.classList.contains('show');
-            
-            // Update ARIA attributes
-            const trigger = dropdown.previousElementSibling;
-            trigger.setAttribute('aria-expanded', !isExpanded);
-            
-            dropdown.classList.toggle('show');
-            
-            // If opening, focus the first interactive element
-            if (!isExpanded) {
-                const firstButton = dropdown.querySelector('button');
-                if (firstButton) firstButton.focus();
-            }
-        }
-        function handleSliderKeyboard(event, sliderId) {
-            const slider = document.getElementById(sliderId);
-            const input = slider.querySelector('input[type="range"]');
-            
-            switch(event.key) {
-                case 'ArrowRight':
-                case 'ArrowUp':
-                    input.value = Number(input.value) + Number(input.step);
-                    break;
-                case 'ArrowLeft':
-                case 'ArrowDown':
-                    input.value = Number(input.value) - Number(input.step);
-                    break;
-            }
-            input.dispatchEvent(new Event('change'));
-            document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                // Close any open dropdowns
-                document.querySelectorAll('.dropdown.show').forEach(dropdown => {
-                    dropdown.classList.remove('show');
-                    const trigger = dropdown.previousElementSibling;
-                    trigger.setAttribute('aria-expanded', 'false');
-                    trigger.focus();
-                });
+                window.startVoiceRecognition();
             }
         });
-      
-      // Submit the recognized command if no new input for 5 seconds
-      function resetPauseTimer() {
-          if (pauseTimer) clearTimeout(pauseTimer);  // Clear any existing timer
-          pauseTimer = setTimeout(() => {
-              recognition.stop();  // Stop recognition after 5 seconds of inactivity
-      
-              // Remove flickering effect from the button when recognition stops
-              document.getElementById('anvaya-item').classList.remove('flickering');
-          }, 5000);  // 5 seconds pause
-      }
-      document.querySelectorAll('.tooltip').forEach(tooltip => {
-            tooltip.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    const tooltipText = tooltip.querySelector('.tooltip-text');
-                    tooltipText.style.visibility = 'visible';
-                    tooltipText.style.opacity = '1';
-                }
-            });
-
-            tooltip.addEventListener('blur', (e) => {
-                const tooltipText = tooltip.querySelector('.tooltip-text');
-                tooltipText.style.visibility = 'hidden';
-                tooltipText.style.opacity = '0';
-            });
-        });
-      // Detect speech input pauses
-      recognition.onaudiostart = resetPauseTimer;  // Reset the timer when speech starts
-      recognition.onend = resetPauseTimer;  // Reset the timer when speech ends
-      
-
-  </script>
-    <script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
+    
+        function resetPauseTimer() {
+            if (pauseTimer) clearTimeout(pauseTimer);
+            pauseTimer = setTimeout(() => {
+                stopVoiceRecognition();
+            }, 5000);
+        }
+    })();
+    </script>
+    
 </body>
 </html>
