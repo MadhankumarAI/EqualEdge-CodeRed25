@@ -1,6 +1,6 @@
 Flask==2.3.2
+mysql-connector-python==8.1.0
 pyttsx3==2.90
 opencv-python==4.8.0.76
-mysql-connector-python==8.1.0
-google-cloud-documentai==2.11.0
+google-cloud-documentai==2.21.0
 Werkzeug==2.3.7
