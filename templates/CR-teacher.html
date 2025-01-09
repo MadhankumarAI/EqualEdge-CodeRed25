@@ -101,7 +101,6 @@
             font-size: 32px;
             font-weight: bold;
         }
-
         .editor-toolbar {
             display: flex;
             gap: 15px;
@@ -126,6 +125,32 @@
             background: #f0f0f0;
         }
 
+        .tooltip {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toolbar-button:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+
+       
+
         .toolbar-button .tooltip {
             visibility: hidden;
             background-color: #333;
@@ -144,10 +169,6 @@
             transition: opacity 0.3s;
         }
 
-        .toolbar-button:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
 
         .upload-area {
             background: white;
@@ -338,23 +359,23 @@
         <input type="text" class="input-field" placeholder="Description (optional)" aria-label="Enter description">
         
         <div class="editor-toolbar" role="toolbar" aria-label="Text formatting options">
-            <button class="toolbar-button" aria-label="Bold">
+            <button class="toolbar-button" aria-label="Bold text">
                 <i class="fas fa-bold"></i>
                 <span class="tooltip">Bold</span>
             </button>
-            <button class="toolbar-button" aria-label="Italics">
+            <button class="toolbar-button" aria-label="Italic text">
                 <i class="fas fa-italic"></i>
                 <span class="tooltip">Italics</span>
             </button>
-            <button class="toolbar-button" aria-label="Underline">
+            <button class="toolbar-button" aria-label="Underline text">
                 <i class="fas fa-underline"></i>
                 <span class="tooltip">Underlined</span>
             </button>
-            <button class="toolbar-button" aria-label="Pointers">
+            <button class="toolbar-button" aria-label="Bullet points">
                 <i class="fas fa-list"></i>
                 <span class="tooltip">Pointers</span>
             </button>
-            <button class="toolbar-button" aria-label="Superscript">
+            <button class="toolbar-button" aria-label="Superscript text">
                 <i class="fas fa-superscript"></i>
                 <span class="tooltip">Superscript</span>
             </button>
@@ -424,17 +445,6 @@
                 console.log('Selected files:', files.map(f => f.name));
                 // Here you can add code to handle the file upload to your server
             }
-        });
-    </script>
-       <audio id="popup-sound" src="static/sounds/popup.mp3" preload="auto"></audio>
-
-    <script>
-        // Play the sound when the page is fully loaded
-        window.addEventListener('DOMContentLoaded', () => {
-            const sound = document.getElementById('popup-sound');
-            sound.play().catch(error => {
-                console.error("Error playing the sound:", error);
-            });
         });
     </script>
 </body>
