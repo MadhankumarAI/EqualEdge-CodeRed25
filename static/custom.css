@@ -1,0 +1,25 @@
+.settings-btn {
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    margin: 10px;
+    width: 200px;
+    text-align: left;
+}
+.settings-container {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+.dropdown, .slider {
+    display: none;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+.dropdown.open, .slider.open {
+    display: block;
+}
