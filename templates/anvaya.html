@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Navigation</title>
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <style>
+        /* Style for the microphone icon */
+        #micIcon {
+            font-size: 24px;
+            margin-left: 10px;
+            color: red;
+            display: none; /* Hidden by default */
+        }
+
+        /* Style for the stop button */
+        #stopButton {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none; /* Hidden by default */
+        }
+    </style>
+    <div class="settings-container">
+        <div class="settings-btn" onclick="toggleDropdown('fontDropdown')">Font</div>
+        <div class="dropdown" id="fontDropdown">
+            <button onclick="setFont('Arial')">Arial</button>
+            <button onclick="setFont('Courier New')">Courier New</button>
+            <button onclick="setFont('Georgia')">Georgia</button>
+        </div>
+    
+        <div class="settings-btn" onclick="toggleSlider('fontSizeSlider')">Font Size</div>
+        <div class="slider" id="fontSizeSlider">
+            <input type="range" min="10" max="50" value="16" onchange="setFontSize(this.value)">
+            <p>Font Size: <span id="fontSizeValue">16px</span></p>
+        </div>
+    
+        <div class="settings-btn" onclick="toggleSlider('contrastSlider')">Contrast</div>
+        <div class="slider" id="contrastSlider">
+            <input type="range" min="0.5" max="2" value="1" step="0.1" onchange="setContrast(this.value)">
+            <p>Contrast: <span id="contrastValue">1</span></p>
+        </div>
+    </div>
+    <script>
+        let recognition;
+        let timeoutId;
+
+        function startVoiceRecognition() {
+            // Show the microphone icon and stop button
+            document.getElementById("micIcon").style.display = "inline";
+            document.getElementById("stopButton").style.display = "inline";
+
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.start();
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById("voiceInput").value = transcript;
+
+                // Clear any existing timeout
+                clearTimeout(timeoutId);
+
+                // Set a new timeout to submit after 3 seconds of pause less latency if 3 second 
+                timeoutId = setTimeout(() => {
+                    sendVoiceCommand();
+                }, 3000);
+            };
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+                hideMicIcon(); // Hide the microphone icon when speech ends
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                hideMicIcon(); // Hide the microphone icon on error
+            };
+        }
+
+        function stopVoiceRecognition() {
+            if (recognition) {
+                recognition.stop();
+                hideMicIcon(); // Hide the microphone icon when stopped manually
+            }
+        }
+
+        function hideMicIcon() {
+            document.getElementById("micIcon").style.display = "none";
+            document.getElementById("stopButton").style.display = "none";
+        }
+
+        async function sendVoiceCommand() {
+            const message = document.getElementById("voiceInput").value;
+            const response = await fetch("/process_voice", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message })
+            });
+            const data = await response.json();
+
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                document.getElementById("result").innerText = data.message;
+            }
+        }
+
+        // Activate voice recognition on spacebar press
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Escape') {
+                startVoiceRecognition();
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Welcome to Anvaya ai . its your guide </h1>
+    <input type="text" id="voiceInput" placeholder="Enter your command" />
+    <button onclick="sendVoiceCommand()">Submit</button>
+    <span id="micIcon">🎤</span> <!-- Microphone icon -->
+    <button id="stopButton" onclick="stopVoiceRecognition()">Stop</button> <!-- Stop button -->
+    <p id="result"></p>
+</body>
+</html>

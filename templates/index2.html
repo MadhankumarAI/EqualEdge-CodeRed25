@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image and Video Processor</title>
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .upload-icon {
+            font-size: 50px;
+            color: #007BFF;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <label for="file-upload" class="upload-icon">
+            <i class="fas fa-plus-circle"></i>
+        </label>
+        <input type="file" id="file-upload" accept="image/*,video/*">
+        <div id="buttons" class="hidden">
+            <button class="btn" id="image-to-text">Image to Text</button>
+            <button class="btn" id="video-captions">Video Captions</button>
+            <button class="btn" id="video-summary">Video Summary</button>
+        </div>
+        <div id="output" style="margin-top: 20px; text-align: left;"></div>
+    </div>
+
+     <script>
+        const fileInput = document.getElementById('file-upload');
+        const buttons = document.getElementById('buttons');
+        const output = document.getElementById('output');
+
+        let uploadedFilePath = '';
+
+        fileInput.addEventListener('change', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (result.file_path) {
+                    uploadedFilePath = result.file_path;
+                    buttons.classList.remove('hidden');
+                    output.innerHTML = '';
+                } else {
+                    output.innerHTML = `<p style='color:red;'>Error: ${result.error}</p>`;
+                }
+            } catch (error) {
+                output.innerHTML = `<p style='color:red;'>Failed to upload file.</p>`;
+            }
+        });
+
+        document.getElementById('image-to-text').addEventListener('click', async () => {
+            if (!uploadedFilePath) return;
+            const response = await fetch('/image-to-text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file_path: uploadedFilePath })
+            });
+            const result = await response.json();
+            output.innerHTML = `<p><strong>Text:</strong> ${result.text}</p><p><strong>Summary:</strong> ${result.summary}</p>`;
+        });
+
+        document.getElementById('video-captions').addEventListener('click', async () => {
+            if (!uploadedFilePath) return;
+            const response = await fetch('/video-captions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file_path: uploadedFilePath })
+            });
+            const result = await response.json();
+            output.innerHTML = `<p><strong>Captions:</strong> ${result.captions}</p>`;
+        });
+
+        document.getElementById('video-summary').addEventListener('click', async () => {
+            if (!uploadedFilePath) return;
+            const response = await fetch('/video-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file_path: uploadedFilePath })
+            });
+            const result = await response.json();
+            output.innerHTML = `<p><strong>Summary:</strong> ${result.summary}</p>`;
+        });
+    </script>
+</body>
+</html>

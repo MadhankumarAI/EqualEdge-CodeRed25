@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equal Edge</title>
+  <script src="{{ url_for('static', filename='custom.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f9ff; /* Light Blue Background */
+      color: #004d40; /* Dark Green Text */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .ai-assistant {
+      text-align: center;
+      border: 2px solid #00897b; /* Green Border */
+      border-radius: 10px;
+      padding: 20px;
+      background-color: #ffffff; /* White Background */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    #display-text {
+      font-size: 1.5rem;
+      color: #004d40; /* Dark Green */
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: none; /* Initially hidden */
+      gap: 20px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: white;
+      background-color: #00897b; /* Green */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .button:hover {
+      background-color: #004d40; /* Darker Green */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="ai-assistant">
+      <p id="display-text"></p>
+    </div>
+    <div class="buttons">
+      <button class="button" id="yes-btn">Yes</button>
+      <button class="button" id="no-btn">No</button>
+    </div>
+  </div>
+  <div class="settings-container">
+    <div class="settings-btn" onclick="toggleDropdown('fontDropdown')">Font</div>
+    <div class="dropdown" id="fontDropdown">
+        <button onclick="setFont('Arial')">Arial</button>
+        <button onclick="setFont('Courier New')">Courier New</button>
+        <button onclick="setFont('Georgia')">Georgia</button>
+    </div>
+
+    <div class="settings-btn" onclick="toggleSlider('fontSizeSlider')">Font Size</div>
+    <div class="slider" id="fontSizeSlider">
+        <input type="range" min="10" max="50" value="16" onchange="setFontSize(this.value)">
+        <p>Font Size: <span id="fontSizeValue">16px</span></p>
+    </div>
+
+    <div class="settings-btn" onclick="toggleSlider('contrastSlider')">Contrast</div>
+    <div class="slider" id="contrastSlider">
+        <input type="range" min="0.5" max="2" value="1" step="0.1" onchange="setContrast(this.value)">
+        <p>Contrast: <span id="contrastValue">1</span></p>
+    </div>
+</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const displayText = document.getElementById('display-text');
+      const buttons = document.querySelector('.buttons');
+      const yesBtn = document.getElementById('yes-btn');
+      const noBtn = document.getElementById('no-btn');
+  
+      // Function to type the text and show buttons
+      async function displayTextWithSpeech(url, showButtons = false) {
+        const response = await fetch(url);
+        const { text } = await response.json();
+        displayText.textContent = ''; // Clear previous text before typing
+  
+        let index = 0; // Initialize index for typing
+  
+        // Typing effect function
+        function typeText() {
+          if (index < text.length) {
+            displayText.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeText, 100); // Adjust speed here
+          }
+        }
+  
+        // Start the typing effect
+        typeText();
+  
+        // Wait for 5 seconds to simulate the speech delay before showing buttons
+        await new Promise(resolve => setTimeout(resolve, 5000));
+  
+        if (showButtons) {
+          buttons.style.display = 'flex'; // Show buttons after 5-second delay
+          startSpeechRecognition(); // Start speech recognition when buttons appear
+        }
+      }
+  
+      // Start speech recognition
+      function startSpeechRecognition() {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.start();
+  
+        recognition.onresult = function (event) {
+          const spokenText = event.results[0][0].transcript.toLowerCase();
+          console.log("User said:", spokenText);
+          alert(spokenText)
+  
+          // Handle the recognized response
+          handleResponse(spokenText);
+        };
+  
+        recognition.onerror = function (event) {
+          console.error("Speech recognition error:", event.error);
+        };
+      }
+  
+      // Send the user response (via speech or button) to the Flask backend
+      const handleResponse = async (answer) => {
+        const response = await fetch('/response', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answer })
+        });
+        const data = await response.json();
+  
+        if (data.redirect) {
+          // Redirect to the upload page if answer is yes
+          window.location.href = data.redirect;
+        } else {
+          // Show alert if not redirected
+          alert(data.message || "Unexpected response");
+        }
+      };
+  
+      // Show welcome message and then the disability question
+      await displayTextWithSpeech('/speak-welcome');
+      await displayTextWithSpeech('/ask-disability', true);
+  
+      // Handle button clicks
+      yesBtn.addEventListener('click', () => handleResponse('yes'));
+      noBtn.addEventListener('click', () => handleResponse('no'));
+    });
+  </script>
+  
+  
+</body>
+</html>
