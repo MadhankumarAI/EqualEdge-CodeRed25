@@ -104,6 +104,11 @@ FACE_WIDTH, FACE_HEIGHT = 80, 80
 # Define upload folder path
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
 
+app.secret_key='key1123'
+app.config['MYSQL_HOST']='munagalachandu.mysqlpythonanywhere-services.com'
+app.config['MYSQL_USER']='munagalachandu'
+app.config['MYSQL_PASSWORD']='python123'
+app.config['MYSQL_DB']='munagalachandu$equaledge'
 
 # Load registered faces into memory
 def load_registered_faces():
@@ -468,18 +473,18 @@ def teacher_signup2():
     else:
         return redirect(url_for('teacher_signup'))
 
-db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'chandu123',
-    'database': 'equaledge'
-}
+
 
 
 # Utility function to interact with the MySQL database
 def execute_query(query, params=(), fetchall=False, fetchone=False, connection=None):
     if connection is None:
-        connection = mysql.connector.connect(**db_config)
+        connection = mysql.connector.connect(
+            host=app.config['MYSQL_HOST'],
+            user=app.config['MYSQL_USER'],
+            password=app.config['MYSQL_PASSWORD'],
+            database=app.config['MYSQL_DB']
+        )
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(query, params)
@@ -509,7 +514,13 @@ def create_test():
         created_by = request.form.get('created_by')
 
         if test_name and created_by:
-            connection = mysql.connector.connect(**db_config)
+            # Connect to the database using app.config
+            connection = mysql.connector.connect(
+                host=app.config['MYSQL_HOST'],
+                user=app.config['MYSQL_USER'],
+                password=app.config['MYSQL_PASSWORD'],
+                database=app.config['MYSQL_DB']
+            )
             try:
                 # Insert test
                 execute_query(
@@ -530,7 +541,7 @@ def create_test():
             except mysql.connector.Error as e:
                 print(f"Database Error: {e}")
             finally:
-                connection.close()
+                connection.close()  # Ensure the connection is closed
         else:
             print("Test name and created_by are required!")
     return render_template('create_test.html')
@@ -592,14 +603,55 @@ def view_submissions(test_id):
         submission_count = 0
     
     return render_template('view_submissions.html', test_id=test_id, submission_count=submission_count)
+
 def get_db_connection():
     return mysql.connector.connect(
-        host=db_config['host'],
-        user=db_config['user'],
-        password=db_config['password'],
-        database=db_config['database']
+        host=app.config['MYSQL_HOST'],
+        user=app.config['MYSQL_USER'],
+        password=app.config['MYSQL_PASSWORD'],
+        database=app.config['MYSQL_DB']
     )
+    
+@app.route('/view-test/<int:test_id>', methods=['GET'])
+def view_test(test_id):
+    """
+    Render the test details and questions for a specific test ID.
+    """
+    try:
+        # Fetch test details from the database
+        test_details = execute_query(
+            "SELECT test_name, created_by FROM Tests WHERE test_id = %s",
+            (test_id,),
+            fetchone=True
+        )
 
+        if not test_details:
+            flash("Test not found!", 'error')
+            return redirect(url_for('take_test'))
+
+        # Fetch questions for the test
+        questions = execute_query(
+            "SELECT question_id, question_text FROM Questions WHERE test_id = %s",
+            (test_id,),
+            fetchall=True
+        )
+
+        if not questions:
+            flash("No questions found for this test!", 'warning')
+
+        # Render the view_test template with test details and questions
+        return render_template(
+            'view_test.html',
+            test_id=test_id,
+            test_name=test_details['test_name'],
+            created_by=test_details['created_by'],
+            questions=questions
+        )
+
+    except mysql.connector.Error as e:
+        flash(f"Database error: {e}", 'error')
+        return redirect(url_for('take_test'))
+    
 @app.route('/view-answers-form', methods=['GET', 'POST'])
 def view_answers_form():
     # Only execute the following block when it's a POST request
