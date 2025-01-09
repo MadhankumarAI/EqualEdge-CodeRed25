@@ -299,8 +299,7 @@ def upload():
     return render_template('upload.html')
 
 # Dictionary to store To-Do items
-tasks = {}
-
+tasks = {}  # Initialize tasks as a dictionary
 
 @app.route("/todo")
 def todo():
@@ -310,11 +309,21 @@ def todo():
 @app.route("/add_todo", methods=["POST"])
 def add_task():
     """Add a task to the to-do list."""
-    task = request.form.get("task")
-    if task:
-        task_id = len(tasks) + 1
-        tasks[task_id] = task
-    return redirect(url_for("todo"))
+    if request.is_json:  # Check for JSON request
+        data = request.get_json()
+        task = data.get("task")
+        if task:
+            task_id = len(tasks) + 1
+            tasks[task_id] = task
+            return jsonify({"message": "Task added successfully", "task": task}), 200
+        return jsonify({"error": "No task provided"}), 400
+    else:  # Handle form submission
+        task = request.form.get("task")
+        if task:
+            task_id = len(tasks) + 1
+            tasks[task_id] = task
+        return redirect(url_for("todo"))
+
 
 
 @app.route("/remove_todo", methods=["POST"])
