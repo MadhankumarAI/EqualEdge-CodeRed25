@@ -8,13 +8,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
 
   <style>
-    body {
+     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #f0f9ff; /* Light Blue Background */
-      color: #004d40; /* Dark Green Text */
+      background-color: #fff0f7;
+      color: #9b004b;
     }
-
+    
     .container {
       display: flex;
       flex-direction: column;
@@ -22,289 +22,343 @@
       justify-content: center;
       height: 100vh;
       text-align: center;
+      margin-right: 400px; /* Make space for settings panel */
     }
 
     .ai-assistant {
-      border: 2px solid #00897b; /* Green Border */
+      border: 2px solid #ff69b4;
       border-radius: 10px;
       padding: 20px;
-      background-color: #ffffff; /* White Background */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(255, 105, 180, 0.2);
       margin-bottom: 20px;
     }
-
+   
     #display-text {
       font-size: 1.5rem;
-      color: #004d40; /* Dark Green */
+      color: #3b0137;
       margin-bottom: 20px;
+      font-family: inherit;
     }
 
     .button {
       padding: 10px 20px;
       font-size: 1rem;
       color: white;
-      background-color: #00897b; /* Green */
+      background-color: #9b004b; /* Dark Pink */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 0 10px;
+    }
+
+    .button:hover {
+      background-color: #ff69b4;
+    }
+
+    .settings-container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      background-color: #fff;
+      padding: 20px;
+      width: 350px;
+      height: 100vh;
+      box-shadow: -2px 0 10px rgba(255, 105, 180, 0.2);
+      overflow-y: auto;
+    }
+
+    .settings-section {
+      background-color: #fff0f7;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .settings-section h3 {
+      color: #9b004b;
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .font-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .font-button {
+      padding: 8px 15px;
+      background-color: #ff69b4;
+      color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s;
     }
 
-    .button:hover {
-      background-color: #004d40; /* Darker Green */
+    .font-button:hover {
+      background-color: #9b004b;
     }
+
+    .slider-container {
+      margin: 15px 0;
+    }
+
+    .slider-container p {
+      margin: 5px 0;
+      color: #9b004b;
+    }
+
+    .slider {
+      width: 100%;
+      margin: 10px 0;
+    }
+
     .ai-tools {
-        font-size: 18px;
-        padding: 16px;
-        position: absolute;
-        top: 50%; /* Center vertically */
-        right: 20px; /* Align to the right */
-        transform: translateY(-50%); /* Adjust for perfect vertical centering */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px; /* Space between elements */
+      color: #9b004b;
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      margin-top: 20px;
     }
-    
-    .ai-tools h3 {
-        margin-bottom: 20px;
-        text-align: center;
-        color: #500323;
+
+    .command-box {
+      background-color: #fff0f7;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
     }
-    
-    .square {
-        width: 300px;
-        height: 300px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #500323;
-        color: white;
-        font-size: 14px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
-        text-align: center;
-        padding: 8px;
+
+    .command-box input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ff69b4;
+      border-radius: 4px;
+      margin-bottom: 10px;
     }
-    
-    .square:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+
+    .command-box button {
+      background-color: #9b004b;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 5px;
     }
-    
-    .square i {
-        margin-right: 5px;
-        font-size: 20px;
-    }       
+
+    .command-box button:hover {
+      background-color: #ff69b4;
+    }
+
+    #micIcon {
+      font-size: 24px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    #stopButton {
+      background-color: #9b004b;
+    }
+
+    .hint {
+      color: #9b004b;
+      margin-top: 20px;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-      <div class="ai-assistant">
+    <div class="container">
+        <div class="ai-assistant">
           <p id="display-text">Loading...</p>
-      </div>
-      <div class="button-container">
-          <button id="yes-button">Yes</button>
-          <button id="no-button">No</button>
-      </div>
-      <p class="hint">Press the spacebar to activate the voice assistant</p>
-  </div>
-  <div class="settings-container">
-    <div class="settings-btn" onclick="toggleDropdown('fontDropdown')">Font</div>
-    <div class="dropdown" id="fontDropdown">
-        <button onclick="setFont('Arial')">Arial</button>
-        <button onclick="setFont('Courier New')">Courier New</button>
-        <button onclick="setFont('Georgia')">Georgia</button>
-    </div>
-
-    <div class="settings-btn" onclick="toggleSlider('fontSizeSlider')">Font Size</div>
-    <div class="slider" id="fontSizeSlider">
-        <input type="range" min="10" max="50" value="16" onchange="setFontSize(this.value)">
-        <p>Font Size: <span id="fontSizeValue">16px</span></p>
-    </div>
-
-    <div class="settings-btn" onclick="toggleSlider('contrastSlider')">Contrast</div>
-    <div class="slider" id="contrastSlider">
-        <input type="range" min="0.5" max="2" value="1" step="0.1" onchange="setContrast(this.value)">
-        <p>Contrast: <span id="contrastValue">1</span></p>
-    </div>
-</div>
-<footer><div class="ai-tools">
-    <h3>AI Tools</h3>
-    <div class="square">
-        <i class="fas fa-robot"></i>
-        <span>Mitra</span>
-    </div>
-    <div class="square">
-        <input type="text" id="voiceInput" placeholder="Enter your command" />
-        <button onclick="sendVoiceCommand(event)">Submit</button>
-        <span id="micIcon" style="cursor: pointer;" onclick="startVoiceRecognition()">🎤</span> <!-- Microphone icon -->
-        <button id="stopButton" style="display: none;" onclick="stopVoiceRecognition(event)">Stop</button> <!-- Stop button -->
+        </div>
+        <div class="button-container">
+          <button id="yes-button" class="button">Yes</button>
+          <button id="no-button" class="button">No</button>
+        </div>
+        <p class="hint">Press the spacebar to activate the voice assistant</p>
     </div>
     
-    <div id="result"></div>
-</div>
-</footer>
-     <audio id="popup-sound" src="static/sounds/popup.mp3" preload="auto"></audio>
+    <div class="settings-container">
+        <div class="settings-section">
+            <h3>Font Selection</h3>
+            <div class="font-options">
+                <button class="font-button" onclick="setFont('Arial')">Arial</button>
+                <button class="font-button" onclick="setFont('Times New Roman')">Times New Roman</button>
+                <button class="font-button" onclick="setFont('Courier New')">Courier New</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Font Size</h3>
+            <div class="slider-container">
+                <input type="range" min="12" max="36" value="16" onchange="setFontSize(this.value)" class="slider">
+                <p>Font Size: <span id="fontSizeValue">16px</span></p>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Contrast</h3>
+            <div class="slider-container">
+                <input type="range" min="0.5" max="2" value="1" step="0.1" onchange="setContrast(this.value)" class="slider">
+                <p>Contrast: <span id="contrastValue">1</span></p>
+            </div>
+        </div>
+
+        <div class="ai-tools">
+            <h3>AI Tools</h3>
+            <div class="command-box">
+                <input type="text" id="voiceInput" placeholder="Enter your command" />
+                <button onclick="sendVoiceCommand(event)">Submit</button>
+                <span id="micIcon">🎤</span>
+                <button id="stopButton">Stop</button>
+            </div>
+            <div id="result"></div>
+        </div>
+    </div>
 
     <script>
-        // Play the sound when the page is fully loaded
-        window.addEventListener('DOMContentLoaded', () => {
-            const sound = document.getElementById('popup-sound');
-            sound.play().catch(error => {
-                console.error("Error playing the sound:", error);
+        // Font and display settings functions
+        function setFont(fontFamily) {
+            document.body.style.fontFamily = fontFamily;
+        }
+
+        function setFontSize(size) {
+            document.body.style.fontSize = size + 'px';
+            document.getElementById('fontSizeValue').textContent = size + 'px';
+        }
+
+        function setContrast(value) {
+            document.body.style.filter = `contrast(${value})`;
+            document.getElementById('contrastValue').textContent = value;
+        }
+
+        // Main functionality
+        document.addEventListener('DOMContentLoaded', async () => {
+            const displayText = document.getElementById('display-text');
+            const yesButton = document.getElementById('yes-button');
+            const noButton = document.getElementById('no-button');
+
+            async function displayTextWithSpeech(url) {
+                const response = await fetch(url);
+                const { text } = await response.json();
+                displayText.textContent = '';
+
+                let index = 0;
+                function typeText() {
+                    if (index < text.length) {
+                        displayText.textContent += text.charAt(index);
+                        index++;
+                        setTimeout(typeText, 50);
+                    }
+                }
+                typeText();
+            }
+
+            await displayTextWithSpeech('/speak-welcome');
+            await new Promise(resolve => setTimeout(resolve, 6000));
+            await displayTextWithSpeech('/ask-disability');
+
+            document.addEventListener('keydown', (event) => {
+                if (event.code === 'Space') {
+                    event.preventDefault();
+                    activateVoiceAssistant();
+                }
+            });
+
+            async function activateVoiceAssistant() {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                recognition.onresult = async (event) => {
+                    const spokenText = event.results[0][0].transcript.toLowerCase();
+                    console.log("User said:", spokenText);
+
+                    const response = await fetch('/process-voice', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: spokenText }),
+                    });
+
+                    const data = await response.json();
+                    if (data.response) {
+                        displayText.textContent = data.response;
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                };
+            }
+
+            yesButton.addEventListener('click', () => {
+                window.location.href = '/upload';
+            });
+
+            noButton.addEventListener('click', () => {
+                window.location.href = '/signup';
             });
         });
-    </script>
 
-  <script>
-      document.addEventListener('DOMContentLoaded', async () => {
-          const displayText = document.getElementById('display-text');
-          const yesButton = document.getElementById('yes-button');
-          const noButton = document.getElementById('no-button');
-
-          // Function to fetch and display text with typing effect
-          async function displayTextWithSpeech(url) {
-              const response = await fetch(url);
-              const { text } = await response.json();
-              displayText.textContent = ''; // Clear previous text
-
-              let index = 0;
-              function typeText() {
-                  if (index < text.length) {
-                      displayText.textContent += text.charAt(index);
-                      index++;
-                      setTimeout(typeText, 50); // Typing speed
-                  }
-              }
-              typeText();
-          }
-
-          // Fetch welcome message and disability question
-          await displayTextWithSpeech('/speak-welcome');
-          await new Promise(resolve => setTimeout(resolve, 6000)); // Delay for speech timing
-          await displayTextWithSpeech('/ask-disability');
-
-          // Voice assistant activation on spacebar
-          document.addEventListener('keydown', (event) => {
-              if (event.code === 'Space') { // Check if spacebar is pressed
-                  event.preventDefault(); // Prevent default spacebar action (e.g., page scroll)
-                  activateVoiceAssistant();
-              }
-          });
-
-          async function activateVoiceAssistant() {
-              const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-              recognition.lang = 'en-US';
-              recognition.start();
-
-              recognition.onresult = async (event) => {
-                  const spokenText = event.results[0][0].transcript.toLowerCase();
-                  console.log("User said:", spokenText);
-
-                  // Send the voice input to Flask backend for processing
-                  const response = await fetch('/process-voice', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ message: spokenText }),
-                  });
-
-                  const data = await response.json();
-                  if (data.response) {
-                      displayText.textContent = data.response;
-                  }
-              };
-
-              recognition.onerror = (event) => {
-                  console.error('Speech recognition error:', event.error);
-              };
-          }
-
-          // Button click event listeners
-          yesButton.addEventListener('click', () => {
-              window.location.href = '/upload'; // Redirect to /upload route
-          });
-
-          noButton.addEventListener('click', () => {
-              window.location.href = '/signup'; // Redirect to /signup route
-          });
-      });
-  </script>
-  <script>
-    let recognition;
-    let pauseTimer;
-    
-    function initializeSpeechRecognition() {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'en-US';
-        recognition.interimResults = false; // Don't show partial results
-        recognition.maxAlternatives = 1; // Only accept the best alternative
-        recognition.continuous = false;
-    
-        // When speech recognition result is available
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            console.log('Recognized command:', transcript);
-            console.log(transcript)
-    
-            // Send the recognized command to the backend for processing
-            fetch('/process_command', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ command: transcript })
-            })
-            .then(response => response.json())
-            .then(data => {
-                window.location.href = data.redirect_url;  // Redirect to the URL received from the backend
-            })
-            .catch(err => console.error('Error:', err));
-        };
-    
-        // Handle errors
-        recognition.onerror = function(event) {
-            console.error('Error occurred in recognition:', event.error);
-        };
-    
-        // Restart recognition on end to handle longer speech
-        recognition.onend = function() {
-            if (!pauseTimer) recognition.start();
-        };
-    }
-    
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            event.preventDefault();  // Prevent default Escape behavior
-            if (!recognition) initializeSpeechRecognition();  // Initialize if not already done
-            recognition.start();  // Start speech recognition
-    
-            // Apply flickering effect on the button when speech recognition starts
-            document.getElementById('anvaya-item').classList.add('flickering');
-            console.log("Speech recognition started.");
+        // Voice recognition setup
+        let recognition;
+        let pauseTimer;
+        
+        function initializeSpeechRecognition() {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.continuous = false;
+        
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                console.log('Recognized command:', transcript);
+        
+                fetch('/process_command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: transcript })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href = data.redirect_url;
+                })
+                .catch(err => console.error('Error:', err));
+            };
+        
+            recognition.onerror = function(event) {
+                console.error('Error occurred in recognition:', event.error);
+            };
+        
+            recognition.onend = function() {
+                if (!pauseTimer) recognition.start();
+            };
         }
-    });
-    
-    // Submit the recognized command if no new input for 5 seconds
-    function resetPauseTimer() {
-        if (pauseTimer) clearTimeout(pauseTimer);  // Clear any existing timer
-        pauseTimer = setTimeout(() => {
-            recognition.stop();  // Stop recognition after 5 seconds of inactivity
-    
-            // Remove flickering effect from the button when recognition stops
-            document.getElementById('anvaya-item').classList.remove('flickering');
-        }, 5000);  // 5 seconds pause
-    }
-    
-    // Detect speech input pauses
-    recognition.onaudiostart = resetPauseTimer;  // Reset the timer when speech starts
-    recognition.onend = resetPauseTimer;  // Reset the timer when speech ends
-    
-
-</script>
-  <script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
-
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                if (!recognition) initializeSpeechRecognition();
+                recognition.start();
+                console.log("Speech recognition started.");
+            }
+        });
+        
+        function resetPauseTimer() {
+            if (pauseTimer) clearTimeout(pauseTimer);
+            pauseTimer = setTimeout(() => {
+                recognition.stop();
+            }, 5000);
+        }
+        
+        recognition.onaudiostart = resetPauseTimer;
+        recognition.onend = resetPauseTimer;
+    </script>
 </body>
 </html>
