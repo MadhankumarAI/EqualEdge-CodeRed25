@@ -447,5 +447,16 @@
             }
         });
     </script>
+       <audio id="popup-sound" src="static/sounds/popup.mp3" preload="auto"></audio>
+
+    <script>
+        // Play the sound when the page is fully loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const sound = document.getElementById('popup-sound');
+            sound.play().catch(error => {
+                console.error("Error playing the sound:", error);
+            });
+        });
+    </script>
 </body>
 </html>
