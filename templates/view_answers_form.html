@@ -60,21 +60,23 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-
-        .mic-button {
-            background-color: #e60050;
-            border: none;
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 1rem;
-        }
+    /* Voice Input Button */
+    .mic-button {
+        background-color: #e60050;
+        border: none;
+        color: white;
+        border-radius: 30%; /* Decreased radius */
+        width: 40px; /* Reduced size */
+        height: 40px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        margin: 10px auto 0; /* Center horizontally and add spacing */
+        font-size: 1rem;
+        position: relative;
+        top: 8px;
+    }
 
         .mic-button:active {
             background-color: #cc0048;
