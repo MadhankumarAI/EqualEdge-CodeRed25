@@ -821,6 +821,59 @@ body.dark-mode {
             height: 40px;
         }
     }
+    /* Word Info Box Styling */
+#wordInfoBox {
+    position: absolute;
+    display: none;
+    padding: 12px;
+    background: #fefefe; /* Light background for readability */
+    border: 1px solid #ccc; /* Subtle border for separation */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    z-index: 1000;
+    max-width: 320px; /* Prevent box from becoming too wide */
+    font-size: 14px; /* Accessible font size */
+    font-family: Arial, sans-serif; /* Clear and simple font */
+    color: #333; /* Dark text for contrast */
+    word-wrap: break-word; /* Wrap long words */
+    transition: opacity 0.3s ease; /* Smooth fade-in */
+}
+
+#wordInfoBox.loading {
+    font-style: italic;
+    color: gray; /* Gray text for "loading" state */
+}
+
+/* Toggle Button Styling */
+#toggleMode {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: #fff; /* White text for visibility */
+    background-color: #28a745; /* Green background for "On" state */
+    border: none;
+    border-radius: 6px; /* Rounded corners */
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+#toggleMode:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+#toggleMode:active {
+    transform: scale(0.95); /* Slight shrink on click */
+}
+
+/* Button Colors for "On" and "Off" */
+#toggleMode[data-mode="off"] {
+    background-color: #dc3545; /* Red background for "Off" state */
+}
+
+
+
     
     
     </style>
@@ -838,7 +891,7 @@ body.dark-mode {
             <ul>
                 <li><a href="{{url_for('home')}}" class="active">Home</a></li>
                 <li><a href="#">Classrooms</a></li>
-                <li><a href="#">To do</a></li>
+                <li><a href="{{url_for('todo')}}">To do</a></li>
             </ul>
         </nav>
       
@@ -905,7 +958,7 @@ body.dark-mode {
 
     
 
-    
+    <div id="wordInfoBox"></div>
 
         <!-- New Blank Section -->
         <section class="blank-section">
@@ -941,7 +994,7 @@ body.dark-mode {
             <div id="google_translate_element"></div>
   <div id="transcription"></div>
   <div id="status"></div>
-  <button class="circular-button" id="toggleMode">On</button>
+
         </div>
         <div class="footer-copyright">
             © All rights reserved. Made by <span class="highlight">EqualEdge</span>
@@ -957,20 +1010,15 @@ body.dark-mode {
     </div>
 
 </footer>
+<button id="toggleMode">On</button>
+
+
+
+
 
 
     </main>
-   <audio id="popup-sound" src="static/sounds/popup.mp3" preload="auto"></audio>
 
-    <script>
-        // Play the sound when the page is fully loaded
-        window.addEventListener('DOMContentLoaded', () => {
-            const sound = document.getElementById('popup-sound');
-            sound.play().catch(error => {
-                console.error("Error playing the sound:", error);
-            });
-        });
-    </script>
 <script>
     //anvaya--------------------------------------------------------
     (() => {
@@ -1062,17 +1110,7 @@ body.dark-mode {
        
         
             
-      <audio id="popup-sound" src="static/sounds/popup.mp3" preload="auto"></audio>
-
-    <script>
-        // Play the sound when the page is fully loaded
-        window.addEventListener('DOMContentLoaded', () => {
-            const sound = document.getElementById('popup-sound');
-            sound.play().catch(error => {
-                console.error("Error playing the sound:", error);
-            });
-        });
-    </script>     
+        
       
 
   <script type="text/javascript">
@@ -1085,24 +1123,26 @@ body.dark-mode {
     }
   </script>
   <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script> 
-  <script>
-    document.getElementById("toggleMode").addEventListener("click", function () {
-        const button = this;
-        if (button.textContent === "On") {
-            button.textContent = "Off";
-            button.style.backgroundColor = "#dc3545"; // Red for "Off"
-        } else {
-            button.textContent = "On";
-            button.style.backgroundColor = "#28a745"; // Green for "On"
-        }
-    });
-  </script>
-  
+ 
+ 
 
+  <!-- Scripts -->
   <script>
-      // Tooltip and state variables
-      const tooltip = document.getElementById("tooltip");
-      let findMeaningMode = true; // Ensure the feature is always active
+      // Toggle Button Functionality
+      document.getElementById("toggleMode").addEventListener("click", function () {
+          const button = this;
+          if (button.textContent === "On") {
+              button.textContent = "Off";
+              button.style.backgroundColor = "#dc3545"; // Red for "Off"
+          } else {
+              button.textContent = "On";
+              button.style.backgroundColor = "#28a745"; // Green for "On"
+          }
+      });
+
+      // Word Info Box and state variables
+      const wordInfoBox = document.getElementById("wordInfoBox");
+      let findMeaningMode = true; // Feature is always active
 
       // Global double-click event listener
       document.addEventListener("dblclick", async (event) => {
@@ -1114,18 +1154,18 @@ body.dark-mode {
           const cleanedWord = selectedText.toLowerCase().replace(/[^a-z]/g, "");
 
           if (!cleanedWord) {
-              tooltip.style.display = "none";
+              wordInfoBox.style.display = "none";
               return;
           }
 
-          // Position the tooltip near the cursor
+          // Position the word info box near the cursor
           const rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
-          tooltip.style.left = `${event.pageX}px`;
-          tooltip.style.top = `${event.pageY + 10}px`;
+          wordInfoBox.style.left = `${event.pageX}px`;
+          wordInfoBox.style.top = `${event.pageY + 10}px`;
 
-          tooltip.textContent = "Loading...";
-          tooltip.classList.add("loading");
-          tooltip.style.display = "block";
+          wordInfoBox.textContent = "Loading...";
+          wordInfoBox.classList.add("loading");
+          wordInfoBox.style.display = "block";
 
           try {
               // Fetch synonyms and antonyms
@@ -1138,25 +1178,22 @@ body.dark-mode {
               const synonym = synonymsData[0]?.word || "No synonyms available";
               const antonym = antonymsData[0]?.word || "No antonyms available";
 
-              // Update tooltip content
-              tooltip.classList.remove("loading");
-              tooltip.innerHTML = `<p><strong>Word:</strong> ${cleanedWord}</p>
-                                   <p><strong>Synonym:</strong> ${synonym}</p>
-                                   <p><strong>Antonym:</strong> ${antonym}</p>`;
+              // Update word info box content
+              wordInfoBox.classList.remove("loading");
+              wordInfoBox.innerHTML = `<p><strong>Word:</strong> ${cleanedWord}</p>
+                                       <p><strong>Synonym:</strong> ${synonym}</p>
+                                       <p><strong>Antonym:</strong> ${antonym}</p>`;
           } catch (error) {
               console.error("Error fetching data:", error);
-              tooltip.textContent = "Error fetching data. Please try again.";
+              wordInfoBox.textContent = "Error fetching data. Please try again.";
           }
       });
 
-      // Hide tooltip when clicking elsewhere
+      // Hide word info box when clicking elsewhere
       document.addEventListener("click", () => {
-          tooltip.style.display = "none";
+          wordInfoBox.style.display = "none";
       });
   </script>
-<script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
   
 </body>
 </html>
