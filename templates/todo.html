@@ -144,11 +144,12 @@
 <body>
     <div class="todo-container">
         <div class="todo-header">To-Do List</div>
-        <ul class="todo-list">
-            {% for id, task in todo_list.items() %}
-                <li class="todo-item">{{ task }}</li>
+        <ul id="todo-list"> <!-- Add the ID here -->
+            {% for a,task in todo_list.items() %}
+                <li> {{ task }}</li>
             {% endfor %}
         </ul>
+        
         <form class="add-todo-form" method="POST" action="/add_todo">
             <input type="text" name="task" placeholder="Add new task..." required>
             <button type="submit">Add</button>
@@ -166,139 +167,76 @@
             <span id="micIcon" style="cursor: pointer;" onclick="startVoiceRecognition()">🎤</span> <!-- Microphone icon -->
             <button id="stopButton" style="display: none;" onclick="stopVoiceRecognition(event)">Stop</button> <!-- Stop button -->
         </div>
-        
+        <button id="listen-button">Listen</button> <!-- Add this button -->
         <div id="result"></div>
     </div>
 
     <script>
-        // JavaScript for Speech Recognition
-        const todoList = document.querySelector('.todo-list');
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-
-        let isListening = false;
-
-        // Event listener for Tab key
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Tab') {
-                event.preventDefault(); // Prevent default Tab behavior
+        // JavaScript Code
+        (() => {
+            const todoList = document.getElementById('todo-list'); // Ensure this matches the ID in HTML
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            let isListening = false;
+        
+            function toggleListening() {
                 if (!isListening) {
                     recognition.start();
+                    console.log("Listening...");
                     isListening = true;
-                }
-            }
-        });
-
-        // Event listener for speech recognition result
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            addTask(transcript);
-            isListening = false;
-        };
-
-        // Event listener for speech recognition end
-        recognition.onend = () => {
-            isListening = false;
-        };
-
-        // Function to add task to the list
-        function addTask(task) {
-            const li = document.createElement('li');
-            li.className = 'todo-item';
-            li.textContent = task;
-            todoList.appendChild(li);
-        }
-
-        // Timeout for pause detection
-        recognition.onspeechend = () => {
-            setTimeout(() => {
-                if (isListening) {
+                } else {
                     recognition.stop();
+                    console.log("Stopped listening.");
+                    isListening = false;
                 }
-            }, 5000); // 5 seconds pause detection
-        };
-    </script>
-    <script>
- // JavaScript for Speech Recognition (Space Key)
-const recognitionComplete = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognitionComplete.continuous = false;
-recognitionComplete.interimResults = false;
-recognitionComplete.lang = 'en-US';
-
-let isListeningComplete = false;
-
-// Event listener for Space key
-document.addEventListener('keydown', (event) => {
-    if (event.key === ' ') {
-        event.preventDefault(); // Prevent default Space behavior
-        if (!isListeningComplete) {
-            recognitionComplete.start();
-            isListeningComplete = true;
-        }
-    }
-});
-
-// Event listener for speech recognition result (Space Key)
-recognitionComplete.onresult = (event) => {
-    const transcript = event.results[0][0].transcript.toLowerCase();
-
-    // Trim "complete" or "done" from the spoken word
-    const taskToRemove = transcript.replace(/^(complete|done)\s+/i, '').trim();
-    console.log(taskToRemove)
-
-    // Remove the task if it matches
-    removeTask(taskToRemove);
-
-    isListeningComplete = false;
-};
-
-// Event listener for speech recognition end (Space Key)
-recognitionComplete.onend = () => {
-    isListeningComplete = false;
-};
-
-// Function to remove task from the list
-function removeTask(taskToRemove) {
-    const tasks = Array.from(document.querySelectorAll('.todo-item'));
-    tasks.forEach(task => {
-        const taskText = task.textContent.toLowerCase();
-        if (isPartialMatch(taskText, taskToRemove)) {
-            task.remove();
-            // Send a request to the backend to remove the task
-            fetch('/remove_todo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ task: taskText }),
-            });
-        }
-    });
-}
-
-// Function to check if two strings are a partial match
-// Improved function to check if two strings are a partial match
-function isPartialMatch(str1, str2) {
-    // Remove extra spaces and convert to lowercase
-    str1 = str1.trim().toLowerCase();
-    str2 = str2.trim().toLowerCase();
-
-    // Split into words for better comparison
-    const words1 = str1.split(/\s+/);
-    const words2 = str2.split(/\s+/);
-
-    // Check if any word in str1 matches any word in str2
-    for (const word1 of words1) {
-        for (const word2 of words2) {
-            if (word1.includes(word2) || word2.includes(word1)) {
-                return true;
             }
-        }
-    }
-    return false;
-}
+        
+            function addTask(task) {
+                if (task && todoList) { // Check if todoList is not null
+                    const li = document.createElement('li');
+                    li.className = 'todo-item';
+                    li.textContent = task;
+                    todoList.appendChild(li); // Append the new task to the list
+        
+                    fetch('/add_todo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ task }),
+                    })
+                        .then(response => response.json())
+                        .then(data => console.log("Task added to backend:", data))
+                        .catch(error => console.error("Error adding task to backend:", error));
+                } else {
+                    console.error("todoList is null or task is empty");
+                }
+            }
+        
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.trim();
+                console.log("Recognized task:", transcript);
+                addTask(transcript);
+                isListening = false;
+            };
+        
+            recognition.onstart = () => console.log("Speech recognition started");
+            recognition.onend = () => console.log("Speech recognition ended");
+            recognition.onerror = (event) => console.error("Speech recognition error:", event);
+        
+            // Add event listener for the "Listen" button
+            const listenButton = document.getElementById('listen-button');
+            if (listenButton) {
+                listenButton.addEventListener('click', toggleListening);
+            }
+        
+            // Event listener for keydown to start recognition with Space bar
+            document.addEventListener("keydown", function (event) {
+                if (event.key === " ") { // Check for the space bar key
+                    event.preventDefault(); // Prevent the default behavior of the space bar
+                    toggleListening(); // Start or stop speech recognition
+                }
+            });
+        })();
     </script>
     
 <script>
@@ -387,6 +325,7 @@ function isPartialMatch(str1, str2) {
             }, 5000);
         }
     })();
+    
     </script>
 </body>
 </html>
