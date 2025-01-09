@@ -75,7 +75,7 @@
         }
 
         h1 {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
         }
 
@@ -90,15 +90,15 @@
             font-size: 18px;
             font-weight: bold;
         }
-
+        
         .input-field {
             background: white;
             border: 2px solid #ddd;
-            padding: 16px;
+            padding: 12px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            font-size: 32px;
+            font-size: 18px;
             font-weight: bold;
         }
         .editor-toolbar {
@@ -169,18 +169,18 @@
             transition: opacity 0.3s;
         }
 
-
+       
         .upload-area {
             background: white;
             border-radius: 8px;
-            height: 150px;
+            height: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             border: 3px dashed #ddd;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-size: 18px;
             font-weight: bold;
         }
@@ -189,56 +189,56 @@
             border-color: #E60050;
             color: #E60050;
         }
-
+       
         .upload-icon {
-            font-size: 32px;
+            font-size: 24px;
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         #file-input {
             display: none;
         }
-
+       
         /* Assignment panel */
         .assignment-panel {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             background: white;
-            padding: 16px;
+            padding: 12px;
             border-radius: 8px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-
+        
         .panel-section {
             flex: 1;
-            min-width: 200px;
+            min-width: 150px;
         }
-
+        
         .section-title {
             color: #666;
-            margin-bottom: 12px;
-            font-size: 36px;
+            margin-bottom: 8px;
+            font-size: 20px;
             font-weight: bold;
         }
-
+        
         .dropdown {
             width: 100%;
-            padding: 12px;
+            padding: 8px;
             border: 2px solid #ddd;
             border-radius: 6px;
-            font-size: 32px;
+            font-size: 16px;
             font-weight: bold;
         }
-
+        
         .assign-section {
             display: flex;
             align-items: center;
             gap: 12px;
             color: #E60050;
             cursor: pointer;
-            font-size: 32px;
+            font-size: 18px;
             font-weight: bold;
         }
 
@@ -247,56 +247,55 @@
             width: 240px;
             position: fixed;
             right: 20px;
-            top: 20px;
+            top: 5px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-height: calc(100vh - 40px);
+            max-height: calc(100vh - 90px);
             overflow-y: auto;
         }
-
+        
         .settings-panel {
-            padding: 20px;
+            padding: 15px;
             border-bottom: 1px solid #eee;
         }
-
+        
         .settings-btn {
-    padding: 12px;
+    padding: 8px;
     cursor: pointer;
-    font-size: 18px;  /* Reduced from 32px */
+    font-size: 14px;  /* Reduced from 32px */
     font-weight: bold;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
         .ai-tools {
-            padding: 20px;
+            padding: 15px;
         }
 
         .ai-tools h3 {
-    font-size: 24px;  /* Reduced from 36px */
+    font-size: 16px;  /* Reduced from 36px */
     font-weight: bold;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
-
 .voice-input {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
+    padding: 8px;
+    margin: 6px 0;
     border: 2px solid #ddd;
     border-radius: 6px;
-    font-size: 16px;  /* Reduced from 32px */
+    font-size: 14px;  /* Reduced from 32px */
     font-weight: bold;
 }
 
 .ai-tools button {
-    padding: 12px 24px;
-    margin: 8px 0;
+    padding: 8px 16px;
+    margin: 6px 0;
     border: none;
     background: #E60050;
     color: white;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 18px;  /* Reduced from 32px */
+    font-size: 14px;  /* Reduced from 32px */
     font-weight: bold;
     width: 100%;
 }
@@ -315,22 +314,32 @@
     }
 
     .main-content {
-        max-width: 100%;
-        margin-right: 0;
-        margin-bottom: 20px;
-        padding: 0 10px;  /* Add some padding */
-    }
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    padding: 0 10px;
+    overflow-x: hidden;
+}
 
     .sidebar {
-        position: static;
-        width: 100%;
-        max-height: none;
-    }
+    width: 100%;
+    margin-top: 20px;
+    position: static;
+    right: 20px;
+    top: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: auto;
+    overflow-y: visible;
+}
 
     .assignment-panel {
         flex-direction: column;
     }
-
+    .settings-panel, .ai-tools {
+        padding: 10px;
+    }
     /* Ensure all elements stay within viewport */
     .input-field,
     .editor-toolbar,
