@@ -149,46 +149,15 @@ input[type="range"] {
     </style>
 </head>
 <body>
-    <!-- Page Heading -->
-    <h1>Test ID: {{ test_id }}</h1>
-
-    <!-- Questions Form -->
-    <form method="POST">
-        {% for question in questions %}
-        <div>
-            <p>{{ question.question_text }}</p>
-            <div>
-                <textarea name="answer_{{ question.question_id }}" id="answer_{{ question.question_id }}" placeholder="Enter your answer here" required></textarea>
-                <button type="button" class="mic-button" data-target="answer_{{ question.question_id }}" title="Voice Input">
-                    <i class="fas fa-microphone"></i>
-                </button>
-            </div>
-        </div>
-        {% endfor %}
-        <button type="submit">Submit Answers</button>
-    </form>
-    <div class="font-settings">
-        <div class="setting-group">
-            <label>Font</label>
-            <div class="font-buttons">
-                <button>Arial</button>
-                <button>Courier New</button>
-                <button>Georgia</button>
-            </div>
-        </div>
-        
-        <div class="setting-group">
-            <label>Font Size</label>
-            <input type="range" id="fontSize" min="8" max="32" value="16">
-            <div class="value">Font Size: 16px</div>
-        </div>
-        
-        <div class="setting-group">
-            <label>Contrast</label>
-            <input type="range" id="contrast" min="0" max="2" step="0.1" value="1">
-            <div class="value">Contrast: 1</div>
-        </div>
-    </div>
+  
+    
+        <h1>Add Questions to Test ID: {{ test_id }}</h1>
+        <form method="POST">
+            <label for="question_text">Question:</label>
+            <textarea name="question_text" id="question_text" required></textarea><br>
+            <button type="submit">Add Question</button>
+        </form>
+    
     <script>
         // Voice Input Logic
         const micButtons = document.querySelectorAll('.mic-button');

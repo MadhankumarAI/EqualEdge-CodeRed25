@@ -105,10 +105,10 @@ FACE_WIDTH, FACE_HEIGHT = 80, 80
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
 
 app.secret_key='key1123'
-app.config['MYSQL_HOST']='munagalachandu.mysqlpythonanywhere-services.com'
-app.config['MYSQL_USER']='munagalachandu'
-app.config['MYSQL_PASSWORD']='python123'
-app.config['MYSQL_DB']='munagalachandu$equaledge'
+app.config['MYSQL_HOST']='localhost'
+app.config['MYSQL_USER']='root'
+app.config['MYSQL_PASSWORD']='chandu123'
+app.config['MYSQL_DB']='equaledge'
 
 # Load registered faces into memory
 def load_registered_faces():
@@ -775,10 +775,10 @@ def view_answers(test_id):
         else:
             flash("Please provide a valid student ID.")
     return render_template('view_answers_form.html', test_id=test_id)
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 40
 
+@app.route("/teacher-signup2")
+def teacher_signup3():
+    return render_template("t_index.html")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

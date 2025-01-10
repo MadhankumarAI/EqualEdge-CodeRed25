@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='custom.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <script src="hover.js"></script>
     <title>EqualEdge</title>
     <style>
         /* General Styles */
@@ -1019,7 +1020,9 @@ body.dark-mode {
 
 
     </main>
-
+    <script>
+        (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+        </script>
 <script>
     //anvaya--------------------------------------------------------
     (() => {
