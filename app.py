@@ -391,7 +391,18 @@ commands = {
     'go to cr-teacher': '/cr-teacher', 'show cr-teacher': '/cr-teacher',
     'go to home page': '/home', 'show home page': '/home',
     'go to profiles': '/profiles', 'show profiles': '/profiles',
-    'go to report': '/report', 'show report': '/report'
+    'go to report': '/report', 'show report': '/report',
+    'go to signin': '/signin', 'show signin': '/signin',
+    'go to teacher signup': '/teacher-signup', 'show teacher signup': '/teacher-signup',
+    'go to teacher index': '/t-index', 'show teacher index': '/t-index',
+    'go to create test': '/create-test', 'show create test': '/create-test',
+    'go to add questions': '/add-questions', 'show add questions': '/add-questions',
+    'go to take test': '/take-test', 'show take test': '/take-test',
+    'go to view submissions': '/view-submissions', 'show view submissions': '/view-submissions',
+    'go to view test': '/view-test', 'show view test': '/view-test',
+    'go to view answers form': '/view-answers-form', 'show view answers form': '/view-answers-form',
+    'go to view answers': '/view-answers', 'show view answers': '/view-answers',
+    'go to teacher signup2': '/teacher-signup2', 'show teacher signup2': '/teacher-signup2'
 }
 
 @app.route('/signup2', methods=['POST'])
