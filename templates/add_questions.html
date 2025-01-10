@@ -91,6 +91,51 @@
         position: relative;
         top: 8px;
     }
+    .font-settings {
+    width: 200px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    padding: 10px;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.font-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.font-buttons button {
+    padding: 1px 8px;
+    background: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 2px;
+    font-size: 13px;
+    cursor: pointer;
+    color:#333;
+}
+
+.font-buttons button:hover {
+    background: #f5f5f5;
+}
+
+input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+}
+
+.value {
+    font-size: 13px;
+    color: #000000;
+    margin-top: 2px;
+}
         .mic-button:active {
             background-color: #cc0048;
         }
@@ -122,7 +167,28 @@
         {% endfor %}
         <button type="submit">Submit Answers</button>
     </form>
-
+    <div class="font-settings">
+        <div class="setting-group">
+            <label>Font</label>
+            <div class="font-buttons">
+                <button>Arial</button>
+                <button>Courier New</button>
+                <button>Georgia</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Font Size</label>
+            <input type="range" id="fontSize" min="8" max="32" value="16">
+            <div class="value">Font Size: 16px</div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Contrast</label>
+            <input type="range" id="contrast" min="0" max="2" step="0.1" value="1">
+            <div class="value">Contrast: 1</div>
+        </div>
+    </div>
     <script>
         // Voice Input Logic
         const micButtons = document.querySelectorAll('.mic-button');
@@ -176,6 +242,359 @@
                 });
             }
         });
+        // Update font size value display
+// Font Settings Controller
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all the font control elements
+    const fontButtons = document.querySelectorAll('.font-buttons button');
+    const fontSizeSlider = document.getElementById('fontSize');
+    const contrastSlider = document.getElementById('contrast');
+
+    // Function to update font family
+    function updateFontFamily(fontFamily) {
+        document.body.style.fontFamily = fontFamily;
+        // Update all text elements
+        const textElements = document.querySelectorAll('p, textarea, button, h1, label, .value');
+        textElements.forEach(element => {
+            element.style.fontFamily = fontFamily;
+        });
+    }
+
+    // Function to update font size
+    function updateFontSize(size) {
+        // Base size for different elements
+        document.body.style.fontSize = `${size}px`;
+        
+        // Scale heading sizes proportionally
+        const headings = document.querySelectorAll('h1');
+        headings.forEach(heading => {
+            heading.style.fontSize = `${size * 1.5}px`;
+        });
+
+        // Update form elements
+        const formElements = document.querySelectorAll('textarea, button:not(.mic-button), label, p');
+        formElements.forEach(element => {
+            element.style.fontSize = `${size}px`;
+        });
+
+        // Update value displays
+        const valueDisplays = document.querySelectorAll('.value');
+        valueDisplays.forEach(display => {
+            display.style.fontSize = `${size * 0.8}px`;
+        });
+    }
+
+    // Function to update contrast
+    function updateContrast(contrast) {
+        // Calculate colors based on contrast
+        const textColor = contrast > 1 
+            ? `rgb(${Math.floor(0/contrast)}, ${Math.floor(0/contrast)}, ${Math.floor(0/contrast)})` 
+            : `rgb(${Math.floor(51 * contrast)}, ${Math.floor(51 * contrast)}, ${Math.floor(51 * contrast)})`;
+        
+        const backgroundColor = contrast > 1
+            ? `rgb(${Math.floor(255/contrast)}, ${Math.floor(255/contrast)}, ${Math.floor(255/contrast)})`
+            : `rgb(${Math.floor(255 * contrast)}, ${Math.floor(255 * contrast)}, ${Math.floor(255 * contrast)})`;
+
+        // Apply colors to body and form
+        document.body.style.backgroundColor = backgroundColor;
+        document.body.style.color = textColor;
+
+        // Update form background with slight transparency
+        const form = document.querySelector('form');
+        if (form) {
+            form.style.backgroundColor = `rgba(${Math.floor(249 * contrast)}, ${Math.floor(249 * contrast)}, ${Math.floor(249 * contrast)}, 0.9)`;
+        }
+
+        // Update text elements
+        const textElements = document.querySelectorAll('p, label, .value');
+        textElements.forEach(element => {
+            element.style.color = textColor;
+        });
+
+        // Update textarea and button styles
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.style.backgroundColor = backgroundColor;
+            textarea.style.color = textColor;
+            textarea.style.borderColor = textColor;
+        });
+    }
+
+    // Event listeners for font buttons
+    fontButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Reset all buttons to default style
+            fontButtons.forEach(btn => {
+                btn.style.background = '#ffffff';
+            });
+            // Highlight selected button
+            button.style.background = '#f0f0f0';
+            // Apply font family
+            updateFontFamily(button.textContent);
+        });
+    });
+
+    // Event listener for font size slider
+    fontSizeSlider.addEventListener('input', (e) => {
+        const newSize = e.target.value;
+        e.target.nextElementSibling.textContent = `Font Size: ${newSize}px`;
+        updateFontSize(Number(newSize));
+    });
+
+    // Event listener for contrast slider
+    contrastSlider.addEventListener('input', (e) => {
+        const newContrast = e.target.value;
+        e.target.nextElementSibling.textContent = `Contrast: ${newContrast}`;
+        updateContrast(Number(newContrast));
+    });
+
+    // Initialize with default values
+    updateFontSize(16);
+    updateContrast(1);
+    updateFontFamily('Arial');
+});
+// Font Settings Voice Control with Enhanced Recognition
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for browser support
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    // Configure recognition settings
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    // Create status indicator
+    const statusIndicator = document.createElement('div');
+    statusIndicator.style.position = 'fixed';
+    statusIndicator.style.top = '20px';
+    statusIndicator.style.right = '20px';
+    statusIndicator.style.padding = '10px 20px';
+    statusIndicator.style.backgroundColor = '#e60050';
+    statusIndicator.style.color = 'white';
+    statusIndicator.style.borderRadius = '4px';
+    statusIndicator.style.zIndex = '1000';
+    statusIndicator.style.display = 'none';
+    document.body.appendChild(statusIndicator);
+
+    // Direct DOM manipulation functions
+    const fontActions = {
+        setFont: (fontName) => {
+            const button = Array.from(document.querySelectorAll('.font-buttons button'))
+                .find(btn => btn.textContent.toLowerCase() === fontName.toLowerCase());
+            if (button) {
+                // Reset all buttons
+                document.querySelectorAll('.font-buttons button').forEach(btn => {
+                    btn.style.background = '#ffffff';
+                });
+                // Highlight selected button
+                button.style.background = '#f0f0f0';
+                // Apply font to body and all text elements
+                document.body.style.fontFamily = fontName;
+                document.querySelectorAll('p, textarea, button, h1, label, .value').forEach(element => {
+                    element.style.fontFamily = fontName;
+                });
+                return true;
+            }
+            return false;
+        },
+        
+        adjustSize: (action) => {
+            const slider = document.getElementById('fontSize');
+            const currentSize = parseInt(slider.value);
+            let newSize = currentSize;
+            
+            switch(action) {
+                case 'larger':
+                    newSize = Math.min(32, currentSize + 2);
+                    break;
+                case 'smaller':
+                    newSize = Math.max(8, currentSize - 2);
+                    break;
+                case 'reset':
+                    newSize = 16;
+                    break;
+            }
+            
+            slider.value = newSize;
+            slider.dispatchEvent(new Event('input'));
+            // Apply size to elements
+            document.body.style.fontSize = `${newSize}px`;
+            document.querySelectorAll('textarea, button:not(.mic-button), label, p').forEach(element => {
+                element.style.fontSize = `${newSize}px`;
+            });
+            document.querySelectorAll('h1').forEach(heading => {
+                heading.style.fontSize = `${newSize * 1.5}px`;
+            });
+            return true;
+        },
+        
+        adjustContrast: (action) => {
+            const slider = document.getElementById('contrast');
+            const currentContrast = parseFloat(slider.value);
+            let newContrast = currentContrast;
+            
+            switch(action) {
+                case 'increase':
+                    newContrast = Math.min(2, currentContrast + 0.2);
+                    break;
+                case 'decrease':
+                    newContrast = Math.max(0, currentContrast - 0.2);
+                    break;
+                case 'normal':
+                    newContrast = 1;
+                    break;
+            }
+            
+            slider.value = newContrast;
+            slider.dispatchEvent(new Event('input'));
+            return true;
+        }
+    };
+
+    // Process voice commands
+    function processVoiceCommand(command) {
+        command = command.toLowerCase().trim();
+        console.log('Recognized command:', command); // Debug log
+
+        let success = false;
+        let feedbackMessage = '';
+
+        // Font commands
+        if (['arial', 'courier', 'georgia'].includes(command)) {
+            success = fontActions.setFont(command);
+            feedbackMessage = `Font changed to ${command}`;
+        }
+        // Size commands
+        else if (command.includes('larger')) {
+            success = fontActions.adjustSize('larger');
+            feedbackMessage = 'Font size increased';
+        }
+        else if (command.includes('smaller')) {
+            success = fontActions.adjustSize('smaller');
+            feedbackMessage = 'Font size decreased';
+        }
+        else if (command.includes('reset') && command.includes('size')) {
+            success = fontActions.adjustSize('reset');
+            feedbackMessage = 'Font size reset';
+        }
+        // Contrast commands
+        else if (command.includes('increase contrast')) {
+            success = fontActions.adjustContrast('increase');
+            feedbackMessage = 'Contrast increased';
+        }
+        else if (command.includes('decrease contrast')) {
+            success = fontActions.adjustContrast('decrease');
+            feedbackMessage = 'Contrast decreased';
+        }
+        else if (command.includes('normal contrast')) {
+            success = fontActions.adjustContrast('normal');
+            feedbackMessage = 'Contrast normalized';
+        }
+
+        // Show feedback
+        showFeedback(feedbackMessage, success);
+    }
+
+    // Feedback display function
+    function showFeedback(message, success) {
+        const feedback = document.createElement('div');
+        feedback.style.position = 'fixed';
+        feedback.style.top = '20px';
+        feedback.style.left = '50%';
+        feedback.style.transform = 'translateX(-50%)';
+        feedback.style.padding = '10px 20px';
+        feedback.style.backgroundColor = success ? '#e60050' : '#cc0048';
+        feedback.style.color = 'white';
+        feedback.style.borderRadius = '4px';
+        feedback.style.zIndex = '1000';
+        feedback.textContent = message || 'Command not recognized';
+        document.body.appendChild(feedback);
+
+        setTimeout(() => feedback.remove(), 2000);
+    }
+
+    // Speech recognition event handlers
+    recognition.onstart = () => {
+        statusIndicator.textContent = '🎤 Listening...';
+        statusIndicator.style.display = 'block';
+        showInstructions();
+    };
+
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript;
+        console.log('Raw command received:', command); // Debug log
+        processVoiceCommand(command);
+    };
+
+    recognition.onend = () => {
+        statusIndicator.style.display = 'none';
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        showFeedback('Error: ' + event.error, false);
+        statusIndicator.style.display = 'none';
+    };
+
+    // Instructions popup
+    function showInstructions() {
+        const instructions = document.createElement('div');
+        instructions.style.position = 'fixed';
+        instructions.style.top = '50%';
+        instructions.style.left = '50%';
+        instructions.style.transform = 'translate(-50%, -50%)';
+        instructions.style.padding = '20px';
+        instructions.style.backgroundColor = 'white';
+        instructions.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        instructions.style.borderRadius = '8px';
+        instructions.style.zIndex = '1000';
+        instructions.innerHTML = `
+            <h3 style="margin-bottom: 10px; color: #e60050;">Available Voice Commands:</h3>
+            <p style="margin-bottom: 8px;">📝 <strong>Fonts:</strong> "Arial", "Courier", "Georgia"</p>
+            <p style="margin-bottom: 8px;">📏 <strong>Size:</strong> "Larger", "Smaller", "Reset size"</p>
+            <p style="margin-bottom: 8px;">🎨 <strong>Contrast:</strong> "Increase contrast", "Decrease contrast", "Normal contrast"</p>
+            <button style="margin-top: 10px; padding: 5px 10px; background: #e60050; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+        `;
+
+        document.body.appendChild(instructions);
+
+        instructions.querySelector('button').addEventListener('click', () => {
+            instructions.remove();
+        });
+
+        setTimeout(() => {
+            if (instructions.parentNode) {
+                instructions.remove();
+            }
+        }, 5000);
+    }
+
+    // Keyboard shortcut handler
+    document.addEventListener('keydown', function(event) {
+        if (event.shiftKey && event.key.toLowerCase() === 'c') {
+            event.preventDefault();
+            recognition.start();
+        }
+    });
+
+    // Add keyboard shortcut hint
+    const fontSettingsDiv = document.querySelector('.font-settings');
+    const shortcutHint = document.createElement('div');
+    shortcutHint.style.marginTop = '15px';
+    shortcutHint.style.padding = '8px';
+    shortcutHint.style.backgroundColor = '#f5f5f5';
+    shortcutHint.style.borderRadius = '4px';
+    shortcutHint.style.fontSize = '12px';
+    shortcutHint.innerHTML = '🎤 Press <strong>Shift + C</strong> to activate voice commands';
+    fontSettingsDiv.appendChild(shortcutHint);
+});
     </script>
     <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
