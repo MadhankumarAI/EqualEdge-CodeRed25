@@ -775,6 +775,10 @@ def view_answers(test_id):
         else:
             flash("Please provide a valid student ID.")
     return render_template('view_answers_form.html', test_id=test_id)
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 40
+
 
 if __name__ == '__main__':
     app.run(debug=True)
