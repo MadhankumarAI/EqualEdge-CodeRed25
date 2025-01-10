@@ -11,7 +11,7 @@ our website comes in with features such as:
  * Real time assessment creation by teachers
  * AI powered asssistants for students to easily access the asssignments
  * Todo Lists for both teachers and students that is real time and voice asssisted
- * HOSTED USING RENDER
+ * HOSTED USING RENDER - https://equaledge-codered25-1.onrender.com
    
    Team captain: Munagala Chandhu (UI-UX Designer, Fronted developer)
    Team member1: Madhan Kumar R (Backend developer , db manager, CV developer)
