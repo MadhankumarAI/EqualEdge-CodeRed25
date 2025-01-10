@@ -4,3 +4,4 @@ pyttsx3==2.90
 opencv-python==4.8.0.76
 google-cloud-documentai==2.21.0
 Werkzeug==2.3.7
+Gunicorn
