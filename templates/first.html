@@ -8,7 +8,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='custom.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
-    <script src="hover.js"></script>
     <title>EqualEdge</title>
     <style>
         /* General Styles */
@@ -872,9 +871,28 @@ body.dark-mode {
 #toggleMode[data-mode="off"] {
     background-color: #dc3545; /* Red background for "Off" state */
 }
+.community-section img {
+    display: block;
+    margin-top: 20px; /* Adjust spacing as needed */
+}
 
+.community-section, .image-section {
+    width: 100%;
+    max-width: 800px; /* Adjust the max-width as needed */
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f7f7f7; /* Optional background color */
+    border: 1px solid #ddd; /* Optional border */
+    border-radius: 10px; /* Optional border radius */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional box shadow */
+}
 
-
+.image-section img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
     
     
     </style>
@@ -907,13 +925,14 @@ body.dark-mode {
             <h2>Join the EqualEdge Community</h2>
             <p>Are you a teacher or a student?</p>
             <div class="buttons">
-               
-                <a href="{{url_for('teacher_signup')}}" class="teacher-btn">Teacher</a>
-                <a href="{{url_for('intro')}}" class="student-btn">Student</a>
-
+                <a href="/teacher_signup" class="teacher-btn">Teacher</a>
+                <a href="/intro" class="student-btn">Student</a>
             </div>
-        </section
-
+           
+        </section>
+        <section class="image-section">
+            <img src="{{ url_for('static', filename='image-code red.png') }}" alt="Code Red Image">
+        </section>
     </div>
     <div class="ai-tools">
         <h3>AI Tools</h3>
@@ -962,10 +981,7 @@ body.dark-mode {
 
     <div id="wordInfoBox"></div>
 
-        <!-- New Blank Section -->
-        <section class="blank-section">
-            <!-- This section is intentionally left blank -->
-        </section>
+  
         <!-- Add this new section below the blank section -->
         <section class="about-us-section">
         <h2>About Us</h2>
@@ -1020,9 +1036,7 @@ body.dark-mode {
 
 
     </main>
-    <script>
-        (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="gQJw-4K4j-oiVrbWbmvtv";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-        </script>
+
 <script>
     //anvaya--------------------------------------------------------
     (() => {
