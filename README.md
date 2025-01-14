@@ -13,7 +13,7 @@ our website comes in with features such as:
  * Todo Lists for both teachers and students that is real time and voice asssisted
  * HOSTED USING RENDER - https://equaledge-codered25-1.onrender.com
    
-   Team captain: Munagala Chandhu (UI-UX Designer, Fronted developer)
-   Team member1: Madhan Kumar R (Backend developer , db manager, CV developer)
-   team member2: chaitra R (UI-UX designer + Frontend developer)
-   Team member3: Shreya (Frontend developer)
+   Team member1: Munagala Chandhu (UI-UX Designer, Fronted developer)
+   Team member2: Madhan Kumar R (Backend developer , db manager, CV developer)
+   team member3: chaitra R (UI-UX designer + Frontend developer)
+   Team member4: Shreya (Frontend developer)
